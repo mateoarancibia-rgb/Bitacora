@@ -347,7 +347,7 @@ body.ro main input,body.ro main textarea{pointer-events:none;opacity:.7}
 'use strict';
 
 /* ---------------- Plan del bloque 1 ---------------- */
-const START = '2026-11-05';           // jueves: parte la semana 1 (semanas de jueves a miércoles)
+const START = '2026-11-06';           // viernes: parte la semana 1 (semanas de viernes a jueves, hasta el 31 dic)
 const BLOCK_WEEKS = 8;
 const DELOAD = [4, 8];
 const isDeload = wk => DELOAD.includes(wk);
@@ -733,7 +733,7 @@ function render(){
 function weekText(wk){ return wk < 1 ? 'Antes del bloque 1' : wk <= BLOCK_WEEKS ? `Semana ${wk} de ${BLOCK_WEEKS}${isDeload(wk) ? ' · descarga' : ''}` : `Semana ${wk}`; }
 function renderHeader(){
   const wk = weekOf(S.date);
-  $('#weekChip').textContent = wk < 1 ? 'El bloque parte el jue 5 nov' : wk <= BLOCK_WEEKS ? `Semana ${wk} de ${BLOCK_WEEKS}${isDeload(wk) ? ' · descarga' : ''}` : 'Bloque terminado';
+  $('#weekChip').textContent = wk < 1 ? 'El bloque parte el vie 6 nov' : wk <= BLOCK_WEEKS ? `Semana ${wk} de ${BLOCK_WEEKS}${isDeload(wk) ? ' · descarga' : ''}` : 'Bloque terminado';
 }
 function renderBanner(){
   let h = '';
@@ -1042,7 +1042,7 @@ function testVal(t, v){ if (v == null) return '—'; if (t.time) return mmss(v);
 function testsHTML(){
   const by = {}; S.tests.forEach((t, id) => { (by[t.test] = by[t.test] || []).push(Object.assign({id}, t)); });
   Object.values(by).forEach(a => a.sort((x, y) => y.date.localeCompare(x.date)));
-  let h = '<div class="card pad stack"><div class="stack-sm"><h2 class="h">Tests</h2><p class="muted">Al cierre del bloque (semana 8, 24–30 dic). La primera vez es tu punto de partida.</p></div><div>';
+  let h = '<div class="card pad stack"><div class="stack-sm"><h2 class="h">Tests</h2><p class="muted">Al cierre del bloque (semana 8, 25–31 dic). La primera vez es tu punto de partida.</p></div><div>';
   TESTS.forEach(t => {
     const a = by[t.k] || []; const cur = a[0], prev = a[1];
     let delta = '';
@@ -1498,6 +1498,13 @@ function importBackup(file){
 if ('serviceWorker' in navigator && location.protocol === 'https:') { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); }); }
 try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
 
+/* Borra del teléfono lo registrado antes del inicio del bloque */
+(function purgeBeforeStart(){
+  try { const o = Local.read(); let ch = false;
+    COLS.forEach(c => { Object.entries(o[c] || {}).forEach(([id, v]) => { const d = (v && v.date) || String(id).slice(0, 10); if (d < START) { delete o[c][id]; ch = true; } }); });
+    if (ch) Local.write(o);
+  } catch (e) {}
+})();
 init();
 })();
 </script>
