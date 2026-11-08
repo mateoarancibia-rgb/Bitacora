@@ -347,9 +347,9 @@ body.ro main input,body.ro main textarea{pointer-events:none;opacity:.7}
 'use strict';
 
 /* ---------------- Plan del bloque 1 ---------------- */
-const START = '2026-11-06';           // viernes: parte la semana 1 (semanas de viernes a jueves, hasta el 31 dic)
-const BLOCK_WEEKS = 8;
-const DELOAD = [4, 8];
+const START = '2026-11-09';           // lunes: parte la semana 1 (7 semanas de lunes a domingo, hasta el 27 dic)
+const BLOCK_WEEKS = 7;
+const DELOAD = [4, 7];
 const isDeload = wk => DELOAD.includes(wk);
 const BW_DEFAULT = 72;
 const GROUP_KNEE = 'Mini-sesión de rodilla';
@@ -410,8 +410,8 @@ const DAY_PLAN_OLD = {0:['fondo'],1:['torsoA'],2:['velocidad','piernaA'],3:['aer
 const PLAN_CHANGE = '2026-11-05'; // desde aquí: una sesión por día
 const DAY_PLAN_NEW = {0:['fondo'],1:['piernaA'],2:['torsoA'],3:['carrera'],4:['torsoB'],5:['bisagra'],6:['libre']};
 const dayPlan = date => (date < PLAN_CHANGE ? DAY_PLAN_OLD : DAY_PLAN_NEW)[parse(date).getDay()];
-const INTERM = {1:'2×6 min',2:'2×7 min',3:'2×8 min',4:'2×6 min',5:'3×6 min',6:'3×7 min',7:'3×8 min',8:'2×6 min'};
-const FONDO = {1:8,2:8,3:9,4:7,5:10,6:11,7:12,8:9};
+const INTERM = {1:'2×6 min',2:'2×7 min',3:'2×8 min',4:'2×6 min',5:'3×6 min',6:'3×7 min',7:'2×6 min'};
+const FONDO = {1:8,2:8,3:9,4:7,5:10,6:11,7:9};
 const CTYPES = [
   {k:'fondo',name:'Fondo largo',run:true},
   {k:'suave',name:'Trote suave',run:true},
@@ -690,7 +690,7 @@ function bodyRec(date){ return (bodyPend.rec && bodyPend.date === date) ? bodyPe
 function sleepOf(date){ const b = bodyRec(date); if (b && b.sleep != null) return b.sleep; const c = S.checkins.get(date); return c && c.sleep != null ? c.sleep : null; }
 function weighIns(){
   const m = new Map();
-  S.body.forEach((b, id) => { const d = (b && b.date) || id; if (b && b.kg != null && validDate(d)) m.set(d, b.kg); });
+  S.body.forEach((b, id) => { const d = (b && b.date) || id; if (b && b.kg != null && validDate(d) && d >= START) m.set(d, b.kg); });
   if (bodyPend.rec) { if (bodyPend.rec.kg != null) m.set(bodyPend.date, bodyPend.rec.kg); else m.delete(bodyPend.date); }
   return [...m.entries()].map(([date, kg]) => ({date, kg})).sort((a, b) => a.date.localeCompare(b.date));
 }
@@ -733,14 +733,14 @@ function render(){
 function weekText(wk){ return wk < 1 ? 'Antes del bloque 1' : wk <= BLOCK_WEEKS ? `Semana ${wk} de ${BLOCK_WEEKS}${isDeload(wk) ? ' · descarga' : ''}` : `Semana ${wk}`; }
 function renderHeader(){
   const wk = weekOf(S.date);
-  $('#weekChip').textContent = wk < 1 ? 'El bloque parte el vie 6 nov' : wk <= BLOCK_WEEKS ? `Semana ${wk} de ${BLOCK_WEEKS}${isDeload(wk) ? ' · descarga' : ''}` : 'Bloque terminado';
+  $('#weekChip').textContent = wk < 1 ? 'El bloque parte el lun 9 nov' : wk <= BLOCK_WEEKS ? `Semana ${wk} de ${BLOCK_WEEKS}${isDeload(wk) ? ' · descarga' : ''}` : 'Bloque terminado';
 }
 function renderBanner(){
   let h = '';
   if (S.mode === 'local') h = '';
   else if (S.mode === 'readonly') h = '<div class="banner"><b>Solo lectura.</b> Puedes ver los registros, pero no editarlos.</div>';
   else if (S.stale) h = '<div class="banner"><b>Todavía no conecto con la nube.</b> Lo que ves puede estar desactualizado; tus cambios se guardan apenas vuelva la conexión.</div>';
-  else if (weekOf(S.date) > BLOCK_WEEKS && S.view === 'hoy') h = '<div class="banner"><b>El bloque de 8 semanas terminó.</b> Pídele a Claude la nueva planificación; mientras tanto, las sesiones siguen con la misma estructura.</div>';
+  else if (weekOf(S.date) > BLOCK_WEEKS && S.view === 'hoy') h = '<div class="banner"><b>El bloque de 7 semanas terminó.</b> Pídele a Claude la nueva planificación; mientras tanto, las sesiones siguen con la misma estructura.</div>';
   $('#banner').innerHTML = h;
 }
 function dateNav(){
@@ -1042,7 +1042,7 @@ function testVal(t, v){ if (v == null) return '—'; if (t.time) return mmss(v);
 function testsHTML(){
   const by = {}; S.tests.forEach((t, id) => { (by[t.test] = by[t.test] || []).push(Object.assign({id}, t)); });
   Object.values(by).forEach(a => a.sort((x, y) => y.date.localeCompare(x.date)));
-  let h = '<div class="card pad stack"><div class="stack-sm"><h2 class="h">Tests</h2><p class="muted">Al cierre del bloque (semana 8, 25–31 dic). La primera vez es tu punto de partida.</p></div><div>';
+  let h = '<div class="card pad stack"><div class="stack-sm"><h2 class="h">Tests</h2><p class="muted">Al cierre del bloque (semana 7, 21–27 dic). La primera vez es tu punto de partida.</p></div><div>';
   TESTS.forEach(t => {
     const a = by[t.k] || []; const cur = a[0], prev = a[1];
     let delta = '';
@@ -1112,12 +1112,13 @@ function weekSummary(date){
 
 /* ---------------- Historial ---------------- */
 function viewHistorial(){
-  const items = [];
+  let items = [];
   allSessionEntries().forEach(([id, s]) => { if (sessionHasData(s)) { const ks = Object.keys(s.items || {}); const nEx = ks.filter(k => hasDone(s.items[k], EX[k])).length; const nSets = sum(ks.map(k => (s.items[k].sets || []).filter(x => x.done).length)); items.push({date:s.date, col:'sessions', id, title:(SESS[s.key] && SESS[s.key].name) || s.name || 'Sesión', sub:[`${nEx} ${nEx === 1 ? 'ejercicio' : 'ejercicios'}`, nSets ? `${nSets} ${nSets === 1 ? 'serie' : 'series'}` : null, s.knee != null ? `rodilla ${s.knee}/10` : null, s.done ? 'terminada' : null].filter(Boolean).join(' · '), sk:s.key}); } });
   S.checkins.forEach((c, id) => items.push({date:c.date || id, col:'checkins', id, title:'Check-in de rodilla', sub:[`dolor ${c.pain}/10`, c.sleep != null ? `sueño ${fmt(c.sleep)} h` : null, c.swollen ? 'hinchada' : null].filter(Boolean).join(' · '), light:lightOf(c)}));
-  S.body.forEach((b, id) => items.push({date:b.date || id, col:'body', id, title:'Peso y sueño', sub:[b.kg != null ? `${fmt(b.kg)} kg` : null, b.sleep != null ? `sueño ${fmt(b.sleep)} h` : null, b.quality ? `durmió ${QUAL[b.quality].toLowerCase()}` : null].filter(Boolean).join(' · ')}));
+  S.body.forEach((b, id) => (b.date || id) >= START && items.push({date:b.date || id, col:'body', id, title:'Peso y sueño', sub:[b.kg != null ? `${fmt(b.kg)} kg` : null, b.sleep != null ? `sueño ${fmt(b.sleep)} h` : null, b.quality ? `durmió ${QUAL[b.quality].toLowerCase()}` : null].filter(Boolean).join(' · ')}));
   S.cardio.forEach((c, id) => items.push({date:c.date, col:'cardio', id, title:CT[c.type] ? CT[c.type].name : c.type, sub:cardioLine(c).split(' · ').slice(1).join(' · ')}));
   S.tests.forEach((t, id) => { const tt = TT[t.test]; items.push({date:t.date, col:'tests', id, title:`Test: ${tt ? tt.name : t.test}`, sub: tt ? testVal(tt, t.value) : ''}); });
+  items = items.filter(x => x.date >= START);
   items.sort((a, b) => b.date.localeCompare(a.date) || a.col.localeCompare(b.col));
   let h = '<h2 class="h">Historial</h2>';
   if (!items.length) return h + '<div class="empty card"><b>Todavía no hay registros.</b><p>Empieza en Hoy: marca tus series y registra cómo amaneció la rodilla.</p><a class="btn primary" href="#hoy">Ir a Hoy</a></div>';
@@ -1498,13 +1499,6 @@ function importBackup(file){
 if ('serviceWorker' in navigator && location.protocol === 'https:') { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); }); }
 try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
 
-/* Borra del teléfono lo registrado antes del inicio del bloque */
-(function purgeBeforeStart(){
-  try { const o = Local.read(); let ch = false;
-    COLS.forEach(c => { Object.entries(o[c] || {}).forEach(([id, v]) => { const d = (v && v.date) || String(id).slice(0, 10); if (d < START) { delete o[c][id]; ch = true; } }); });
-    if (ch) Local.write(o);
-  } catch (e) {}
-})();
 init();
 })();
 </script>
