@@ -406,6 +406,10 @@ const EX = {
   sprintT:{name:'Test: sprint de 10 m',kind:'check',label:'3 intentos con 3 min de pausa. Anota el mejor en Progreso → Tests.'},
   cincoT:{name:'Test: 5 km contra reloj',kind:'check',label:'10 min después del sprint, en plano. Anota el tiempo en Progreso → Tests.'},
   fondoS:{name:'Trote muy suave',kind:'check',label:'30–35 min (5–6 km) o descanso si las piernas están cargadas: mañana es el día de RM.'},
+  transFB:{name:'Técnica liviana',kind:'check',label:'Sentadilla al cajón, press banca, remo con barra, peso muerto rumano y press militar: 2×5 cada uno al ~60% de tu RM técnico, dejando 4 repeticiones en reserva.'},
+  transCore:{name:'Core y rodilla',kind:'check',label:'Plancha lateral 2×30 s por lado · Pallof press 2×10 por lado · extensión a una pierna 2×12 · gemelos 2×15.'},
+  transRun:{name:'Trote suave',kind:'check',label:'30–40 min en plano, a ritmo de conversación.'},
+  transMob:{name:'Movilidad',kind:'check',label:'15 min: cadera, tobillo y columna torácica.'},
   cierreC:{name:'Movilidad y trote suave',kind:'check',label:'20 min de movilidad + 20–30 min de trote o bici suave. Día 50: listo.'},
   saltoAdel:{name:'Salto largo a pies juntos',kind:'reps',sets:4,reps:3,repsLabel:'3 saltos',rest:90,note:'Desde quieto, cae en silencio y queda estable antes del siguiente.',knee:true,sub:'se saltan hoy'},
 };
@@ -425,11 +429,14 @@ const SESS = {
   tests23:{name:'Sprint y 5 km',time:'~60 min',pre:'Solo con la rodilla en verde. Al aire libre, en plano.',items:['calentOut','sprintT','cincoT']},
   fondoSuave:{name:'Trote suave',time:'~35 min',items:['fondoS']},
   cierre:{name:'Cierre del reto',time:'~40 min',items:['cierreC']},
+  transA:{name:'Transición: cuerpo completo',time:'~50 min',pre:'Puente hacia el ciclo enero–febrero: todo liviano, para mover el cuerpo sin cansarlo.',items:['calent','transFB','transCore']},
+  transB:{name:'Transición: trote y movilidad',time:'~50 min',pre:'Puente hacia el ciclo enero–febrero: aeróbico suave y movilidad.',items:['calentOut','transRun','transMob']},
 };
 const DAY_PLAN_OLD = {0:['fondo'],1:['torsoA'],2:['velocidad','piernaA'],3:['aerobico'],4:['intermitente','bisagra'],5:['torsoB'],6:['libre']};
 const PLAN_CHANGE = '2026-11-05'; // desde aquí: una sesión por día
 const DAY_PLAN_NEW = {0:['fondo'],1:['piernaA'],2:['torsoA'],3:['carrera'],4:['torsoB'],5:['bisagra'],6:['libre']};
-const DAY_OVERRIDE = {'2026-12-23':['tests23'], '2026-12-25':['libre'], '2026-12-27':['fondoSuave'], '2026-12-28':['rm'], '2026-12-29':['cierre']};
+const DAY_OVERRIDE = {'2026-12-23':['tests23'], '2026-12-25':['libre'], '2026-12-27':['fondoSuave'], '2026-12-28':['rm'], '2026-12-29':['cierre'], '2026-12-30':['transA'], '2026-12-31':['transB'], '2027-01-01':['libre']};
+const TRANS_END = '2027-01-01';
 const TEST_NOTE = {'2026-12-21':'después del calentamiento, salto largo a pies juntos y extensión a una pierna. Anótalos en Progreso → Tests.', '2026-12-22':'dominada con +10 kg, repeticiones máximas, al inicio de la sesión.', '2026-12-24':'press militar 5RM, al inicio de la sesión.', '2026-12-28':'anota el mejor single de cada ejercicio en Progreso → Tests.'};
 const dayPlan = date => DAY_OVERRIDE[date] || (date < PLAN_CHANGE ? DAY_PLAN_OLD : DAY_PLAN_NEW)[parse(date).getDay()];
 const INTERM = {1:'2×6 min',2:'2×7 min',3:'2×8 min',4:'2×6 min',5:'3×6 min',6:'3×7 min',7:'2×6 min'};
@@ -758,14 +765,14 @@ function render(){
 function weekText(wk){ return wk < 1 ? 'Antes del reto' : wk <= BLOCK_WEEKS ? `Semana ${wk} de ${BLOCK_WEEKS}${isDeload(wk) ? ' · descarga' : ''}` : 'Reto terminado'; }
 function renderHeader(){
   const wk = weekOf(S.date);
-  { const n = dayNum(S.date); $('#weekChip').textContent = n < 1 ? 'El reto parte el mar 10 nov' : n <= TOTAL_DAYS ? `Día ${n} de ${TOTAL_DAYS} · faltan ${TOTAL_DAYS - n}` : 'Reto terminado'; }
+  { const n = dayNum(S.date); $('#weekChip').textContent = n < 1 ? 'El reto parte el mar 10 nov' : n <= TOTAL_DAYS ? `Día ${n} de ${TOTAL_DAYS} · faltan ${TOTAL_DAYS - n}` : S.date <= TRANS_END ? 'Transición al ciclo ene–feb' : 'Reto terminado'; }
 }
 function renderBanner(){
   let h = '';
   if (S.mode === 'local') h = '';
   else if (S.mode === 'readonly') h = '<div class="banner"><b>Solo lectura.</b> Puedes ver los registros, pero no editarlos.</div>';
   else if (S.stale) h = '<div class="banner"><b>Todavía no conecto con la nube.</b> Lo que ves puede estar desactualizado; tus cambios se guardan apenas vuelva la conexión.</div>';
-  else if (weekOf(S.date) > BLOCK_WEEKS && S.view === 'hoy') h = '<div class="banner"><b>Terminaste los 50 días.</b> Pídele a Claude la nueva planificación; mientras tanto, las sesiones siguen con la misma estructura.</div>';
+  else if (weekOf(S.date) > BLOCK_WEEKS && S.view === 'hoy') h = '<div class="banner"><b>Terminaste los 50 días.</b> ' + (S.date <= TRANS_END ? 'Hasta el 1 de enero son días de transición, livianos, para llegar fresco al ciclo enero–febrero.' : 'Pídele a Claude el ciclo enero–febrero; mientras tanto, las sesiones siguen con la misma estructura.') + '</div>';
   $('#banner').innerHTML = h;
 }
 function dateNav(){
