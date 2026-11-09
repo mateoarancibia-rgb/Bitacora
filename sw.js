@@ -1,4 +1,4 @@
-const C = 'bitacora-v8';
+const C = 'bitacora-v9';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './foto-180.png', './foto-192.png', './foto-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(C).then(c => c.addAll(ASSETS))); self.skipWaiting(); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== C).map(k => caches.delete(k))))); self.clients.claim(); });

@@ -400,6 +400,13 @@ const EX = {
   fondos:{name:'Fondos lastrados',short:'Fondos +kg',kind:'added',sets:4,reps:5,repsLabel:'5–6',rir:2,start:7.5,step:2.5,rest:120,lift:true,note:'Mancuerna entre las rodillas o mochila con discos.'},
   pallof:{name:'Pallof press',kind:'reps',sets:3,reps:10,repsLabel:'10 por lado',rest:45},
   fondo:{name:'Fondo largo suave',kind:'cardio',ctype:'fondo',note:'A ritmo de conversación, pasos cortos, en tierra o pasto si puedes.',knee:true,sub:'bici o elíptica, el mismo tiempo'},
+  rmSq:{name:'Sentadilla: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,knee:true,note:'A paralelo como mucho y con barras de seguridad.',sub:'hoy no: solo banca'},
+  rmBp:{name:'Banca: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,note:'Con alguien que te asista.'},
+  rmDl:{name:'Peso muerto: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,knee:true,note:'Con barra hexagonal si hay; si no, convencional.',sub:'hoy no: solo banca'},
+  sprintT:{name:'Test: sprint de 10 m',kind:'check',label:'3 intentos con 3 min de pausa. Anota el mejor en Progreso → Tests.'},
+  cincoT:{name:'Test: 5 km contra reloj',kind:'check',label:'10 min después del sprint, en plano. Anota el tiempo en Progreso → Tests.'},
+  fondoS:{name:'Trote muy suave',kind:'check',label:'30–35 min (5–6 km) o descanso si las piernas están cargadas: mañana es el día de RM.'},
+  cierreC:{name:'Movilidad y trote suave',kind:'check',label:'20 min de movilidad + 20–30 min de trote o bici suave. Día 50: listo.'},
   saltoAdel:{name:'Salto largo a pies juntos',kind:'reps',sets:4,reps:3,repsLabel:'3 saltos',rest:90,note:'Desde quieto, cae en silencio y queda estable antes del siguiente.',knee:true,sub:'se saltan hoy'},
 };
 const KNEE_MINI = ['rod_ext','rod_step','rod_trineo','rod_cph','rod_gem'];
@@ -414,11 +421,17 @@ const SESS = {
   torsoB:{name:'Torso B',time:'~65 min',items:['calent','militar','supinas','fondos','pallof','cuello',...KNEE_MINI]},
   fondo:{name:'Fondo largo',time:'',items:['fondo']},
   libre:{name:'Descanso',time:'',items:[]},
+  rm:{name:'Día de RM',time:'~90 min',pre:'Sentadilla → banca → peso muerto, con 5–8 min entre intentos pesados. Subida 5 → 3 → 2 → 1 → 1: el último single con 1 repetición en reserva y sin intentos fallidos. Si en el calentamiento la rodilla pasa de 2/10, hoy solo banca.',items:['calent','rmSq','rmBp','rmDl']},
+  tests23:{name:'Sprint y 5 km',time:'~60 min',pre:'Solo con la rodilla en verde. Al aire libre, en plano.',items:['calentOut','sprintT','cincoT']},
+  fondoSuave:{name:'Trote suave',time:'~35 min',items:['fondoS']},
+  cierre:{name:'Cierre del reto',time:'~40 min',items:['cierreC']},
 };
 const DAY_PLAN_OLD = {0:['fondo'],1:['torsoA'],2:['velocidad','piernaA'],3:['aerobico'],4:['intermitente','bisagra'],5:['torsoB'],6:['libre']};
 const PLAN_CHANGE = '2026-11-05'; // desde aquí: una sesión por día
 const DAY_PLAN_NEW = {0:['fondo'],1:['piernaA'],2:['torsoA'],3:['carrera'],4:['torsoB'],5:['bisagra'],6:['libre']};
-const dayPlan = date => (date < PLAN_CHANGE ? DAY_PLAN_OLD : DAY_PLAN_NEW)[parse(date).getDay()];
+const DAY_OVERRIDE = {'2026-12-23':['tests23'], '2026-12-25':['libre'], '2026-12-27':['fondoSuave'], '2026-12-28':['rm'], '2026-12-29':['cierre']};
+const TEST_NOTE = {'2026-12-21':'después del calentamiento, salto largo a pies juntos y extensión a una pierna. Anótalos en Progreso → Tests.', '2026-12-22':'dominada con +10 kg, repeticiones máximas, al inicio de la sesión.', '2026-12-24':'press militar 5RM, al inicio de la sesión.', '2026-12-28':'anota el mejor single de cada ejercicio en Progreso → Tests.'};
+const dayPlan = date => DAY_OVERRIDE[date] || (date < PLAN_CHANGE ? DAY_PLAN_OLD : DAY_PLAN_NEW)[parse(date).getDay()];
 const INTERM = {1:'2×6 min',2:'2×7 min',3:'2×8 min',4:'2×6 min',5:'3×6 min',6:'3×7 min',7:'2×6 min'};
 const FONDO = {1:8,2:8,3:9,4:7,5:10,6:11,7:9};
 const CTYPES = [
@@ -437,6 +450,9 @@ const TESTS = [
   {k:'dom10',name:'Dominada con +10 kg',unit:'reps',better:1,hint:'Repeticiones máximas limpias.'},
   {k:'militar5',name:'Press militar 5RM',unit:'kg',better:1,hint:'El peso con el que haces 5 repeticiones.'},
   {k:'cinco',name:'5 km contra reloj',unit:'',better:-1,time:true,hint:'En plano y solo con la rodilla en verde. Escribe el tiempo como mm:ss.'},
+  {k:'rmsq',name:'Sentadilla 1RM técnico',unit:'kg',better:1,hint:'El mejor single con 1 en reserva, a la profundidad que tolera la rodilla.'},
+  {k:'rmbp',name:'Banca 1RM técnico',unit:'kg',better:1,hint:'El mejor single con 1 en reserva.'},
+  {k:'rmdl',name:'Peso muerto 1RM técnico',unit:'kg',better:1,hint:'El mejor single con 1 en reserva.'},
   {k:'sprint10',name:'Sprint de 10 m',unit:'s',better:-1,hint:'Cronometrado; un video en cámara lenta sirve. Solo con la rodilla en verde.'},
 ];
 const TT = Object.fromEntries(TESTS.map(t => [t.k, t]));
@@ -482,7 +498,7 @@ const e1rm = (kg, reps) => (kg == null || !reps) ? null : kg * (1 + reps / 30);
 const mmss = sec => { if (sec == null) return '—'; const s = Math.round(sec); return `${Math.floor(s / 60)}:${pad(s % 60)}`; };
 const parseTime = t => { const m = String(t || '').trim().match(/^(\d{1,3})[:.,](\d{1,2})$/); if (m) return Number(m[1]) * 60 + Number(m[2]); const n = num(t); return n == null ? null : n * 60; };
 const countTarget = (ex, wk) => (wk >= 3 && ex.target3) ? ex.target3 : ex.target;
-const setsFor = (ex, wk) => isDeload(wk) ? Math.max(1, Math.round(ex.sets * 0.6)) : ex.sets;
+const setsFor = (ex, wk) => (isDeload(wk) && !ex.fixed) ? Math.max(1, Math.round(ex.sets * 0.6)) : ex.sets;
 const sessionId = (date, sk) => `${date}_${sk}`;
 
 /* ---------------- Estado ---------------- */
@@ -779,6 +795,7 @@ function viewHoy(){
   let h = dateNav();
   h += `<div class="card knee-row"><div class="row"><span class="label">Rodilla al despertar</span>${ci ? lightChip(L, `${ci.pain}/10`) : '<span class="muted">Sin check-in</span>'}</div><a class="btn ${ci ? '' : 'primary'}" href="#rodilla">${ci ? 'Editar' : 'Registrar'}</a></div>`;
   if (L === 'amarillo' || L === 'rojo') h += `<div class="banner" data-l="${L}"><b>${LIGHT[L].word}:</b> ${LIGHT[L].todo}</div>`;
+  if (TEST_NOTE[date]) h += `<div class="banner"><b>Test hoy:</b> ${TEST_NOTE[date]}</div>`;
   h += bodyCardHTML(date);
   h += fotoCardHTML(date);
   if (keys.length > 1) h += `<div class="seg slots" role="tablist" aria-label="Sesión del día">${keys.map((k, i) => `<button type="button" role="tab" aria-selected="${i === S.sessIdx}" data-act="slot" data-i="${i}"><b>${SESS[k].slot}</b>${esc(SESS[k].name)}</button>`).join('')}</div>`;
@@ -1052,7 +1069,7 @@ function testVal(t, v){ if (v == null) return '—'; if (t.time) return mmss(v);
 function testsHTML(){
   const by = {}; S.tests.forEach((t, id) => { (by[t.test] = by[t.test] || []).push(Object.assign({id}, t)); });
   Object.values(by).forEach(a => a.sort((x, y) => y.date.localeCompare(x.date)));
-  let h = '<div class="card pad stack"><div class="stack-sm"><h2 class="h">Tests</h2><p class="muted">Al cierre del bloque (semana 7, 21–27 dic). La primera vez es tu punto de partida.</p></div><div>';
+  let h = '<div class="card pad stack"><div class="stack-sm"><h2 class="h">Tests</h2><p class="muted">Semana 7: tests del 21 al 24 dic y día de RM el lunes 28. La primera vez es tu punto de partida.</p></div><div>';
   TESTS.forEach(t => {
     const a = by[t.k] || []; const cur = a[0], prev = a[1];
     let delta = '';
