@@ -437,6 +437,9 @@ const PLAN_CHANGE = '2026-11-05'; // desde aquí: una sesión por día
 const DAY_PLAN_NEW = {0:['fondo'],1:['piernaA'],2:['torsoA'],3:['carrera'],4:['torsoB'],5:['bisagra'],6:['libre']};
 const DAY_OVERRIDE = {'2026-12-23':['tests23'], '2026-12-25':['libre'], '2026-12-27':['fondoSuave'], '2026-12-28':['rm'], '2026-12-29':['cierre'], '2026-12-30':['transA'], '2026-12-31':['transB'], '2027-01-01':['libre']};
 const TRANS_END = '2027-01-01';
+const YEAR_START = '2027-01-01';
+const yearDay = s => s >= YEAR_START ? daysBetween(YEAR_START, s) + 1 : 0;
+const YEAR_DAYS = 365;
 const TEST_NOTE = {'2026-12-21':'después del calentamiento, salto largo a pies juntos y extensión a una pierna. Anótalos en Progreso → Tests.', '2026-12-22':'dominada con +10 kg, repeticiones máximas, al inicio de la sesión.', '2026-12-24':'press militar 5RM, al inicio de la sesión.', '2026-12-28':'anota el mejor single de cada ejercicio en Progreso → Tests.'};
 const dayPlan = date => DAY_OVERRIDE[date] || (date < PLAN_CHANGE ? DAY_PLAN_OLD : DAY_PLAN_NEW)[parse(date).getDay()];
 const INTERM = {1:'2×6 min',2:'2×7 min',3:'2×8 min',4:'2×6 min',5:'3×6 min',6:'3×7 min',7:'2×6 min'};
@@ -765,7 +768,7 @@ function render(){
 function weekText(wk){ return wk < 1 ? 'Antes del reto' : wk <= BLOCK_WEEKS ? `Semana ${wk} de ${BLOCK_WEEKS}${isDeload(wk) ? ' · descarga' : ''}` : 'Reto terminado'; }
 function renderHeader(){
   const wk = weekOf(S.date);
-  { const n = dayNum(S.date); $('#weekChip').textContent = n < 1 ? 'El reto parte el mar 10 nov' : n <= TOTAL_DAYS ? `Día ${n} de ${TOTAL_DAYS} · faltan ${TOTAL_DAYS - n}` : S.date <= TRANS_END ? 'Transición al ciclo ene–feb' : 'Reto terminado'; }
+  { const n = dayNum(S.date), y = yearDay(S.date); $('#weekChip').textContent = y ? `Día ${y} de ${YEAR_DAYS} · faltan ${Math.max(0, YEAR_DAYS - y)}` : n < 1 ? 'El reto parte el mar 10 nov' : n <= TOTAL_DAYS ? `Día ${n} de ${TOTAL_DAYS} · faltan ${TOTAL_DAYS - n}` : S.date <= TRANS_END ? 'Transición al ciclo ene–feb' : 'Reto terminado'; }
 }
 function renderBanner(){
   let h = '';
@@ -779,7 +782,7 @@ function dateNav(){
   const isToday = S.date === todayISO();
   return `<div class="datenav">
     <button class="btn icon" type="button" data-act="day" data-d="-1" aria-label="Día anterior"${S.date <= START ? ' disabled' : ''}>${ICON.left}</button>
-    <label class="datebtn"><b>${esc(dayLabel(S.date))}</b><small>${isToday ? 'Hoy · ' : ''}${dayNum(S.date) <= TOTAL_DAYS ? `Día ${dayNum(S.date)} · ` : ''}${esc(weekText(weekOf(S.date)))}</small><input type="date" id="datePick" value="${S.date}" min="${START}" aria-label="Elegir fecha"></label>
+    <label class="datebtn"><b>${esc(dayLabel(S.date))}</b><small>${isToday ? 'Hoy · ' : ''}${yearDay(S.date) ? `Día ${yearDay(S.date)} de ${YEAR_DAYS}` : `${dayNum(S.date) <= TOTAL_DAYS ? `Día ${dayNum(S.date)} · ` : ''}${esc(weekText(weekOf(S.date)))}`}</small><input type="date" id="datePick" value="${S.date}" min="${START}" aria-label="Elegir fecha"></label>
     <button class="btn icon" type="button" data-act="day" data-d="1" aria-label="Día siguiente">${ICON.right}</button>
   </div>`;
 }
