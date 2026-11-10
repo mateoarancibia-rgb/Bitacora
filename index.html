@@ -358,7 +358,7 @@ const WEEK0 = '2026-11-09';           // lunes de la semana 1 (semanas de lunes 
 const TOTAL_DAYS = 50;
 const dayNum = s => daysBetween(START, s) + 1;
 const BLOCK_WEEKS = 7;
-const DELOAD = [4];
+const DELOAD = [];
 const isDeload = wk => DELOAD.includes(wk);
 const BW_DEFAULT = 72;
 const GROUP_KNEE = 'Mini-sesión de rodilla';
@@ -447,8 +447,8 @@ const yearDay = s => s >= YEAR_START ? daysBetween(YEAR_START, s) + 1 : 0;
 const YEAR_DAYS = 365;
 const TEST_NOTE = {'2026-12-21':'después del calentamiento, salto largo a pies juntos y extensión a una pierna. Anótalos en Progreso → Tests.', '2026-12-22':'dominada con +10 kg, repeticiones máximas, al inicio de la sesión.', '2026-12-24':'press militar 5RM, al inicio de la sesión.', '2026-12-30':'anota el mejor single de cada ejercicio en Progreso → Tests.'};
 const dayPlan = date => DAY_OVERRIDE[date] || (date < PLAN_CHANGE ? DAY_PLAN_OLD : DAY_PLAN_NEW)[parse(date).getDay()];
-const INTERM = {1:'2×6 min',2:'2×7 min',3:'2×8 min',4:'2×6 min',5:'3×6 min',6:'3×7 min',7:'3×8 min'};
-const FONDO = {1:8,2:8,3:9,4:7,5:10,6:11,7:12};
+const INTERM = {1:'2×6 min',2:'2×7 min',3:'2×8 min',4:'3×6 min',5:'3×7 min',6:'3×8 min',7:'3×8 min'};
+const FONDO = {1:8,2:8,3:9,4:10,5:10,6:11,7:12};
 const CTYPES = [
   {k:'fondo',name:'Fondo largo',run:true},
   {k:'suave',name:'Trote suave',run:true},
