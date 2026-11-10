@@ -353,7 +353,7 @@ body.ro main input,body.ro main textarea{pointer-events:none;opacity:.7}
 'use strict';
 
 /* ---------------- Plan del bloque 1 ---------------- */
-const START = '2026-11-10';           // martes: día 1 del reto de 50 días (hasta el 29 dic)
+const START = '2026-11-11';           // miércoles: día 1 del reto de 50 días (hasta el 30 dic)
 const WEEK0 = '2026-11-09';           // lunes de la semana 1 (semanas de lunes a domingo)
 const TOTAL_DAYS = 50;
 const dayNum = s => daysBetween(START, s) + 1;
@@ -403,6 +403,7 @@ const EX = {
   rmSq:{name:'Sentadilla: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,knee:true,note:'A paralelo como mucho y con barras de seguridad.',sub:'hoy no: solo banca'},
   rmBp:{name:'Banca: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,note:'Con alguien que te asista.'},
   rmDl:{name:'Peso muerto: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,knee:true,note:'Con barra hexagonal si hay; si no, convencional.',sub:'hoy no: solo banca'},
+  activAM:{name:'Activación (mañana)',kind:'check',label:'2 rondas: 5 dominadas · 10 flexiones · 10 puentes de glúteo · 20 s de plancha. Liviano, dejando 4 o más repeticiones en reserva: mañana toca Torso B.'},
   sprintT:{name:'Test: sprint de 10 m',kind:'check',label:'3 intentos con 3 min de pausa. Anota el mejor en Progreso → Tests.'},
   cincoT:{name:'Test: 5 km contra reloj',kind:'check',label:'10 min después del sprint, en plano. Anota el tiempo en Progreso → Tests.'},
   fondoS:{name:'Trote muy suave',kind:'check',label:'30–35 min (5–6 km) o descanso si las piernas están cargadas: mañana es el día de RM.'},
@@ -417,7 +418,7 @@ const KNEE_MINI = ['rod_ext','rod_step','rod_trineo','rod_cph','rod_gem'];
 const SESS = {
   torsoA:{name:'Torso A',time:'~65 min',items:['calent','banca','dom_lastre','remo','vuelos','rueda','cuello',...KNEE_MINI]},
   velocidad:{name:'Velocidad y saltos',slot:'AM',time:'~45 min',pre:'Al aire libre y sin implementos: basta un pasto o una cancha plana. 15 min de calentamiento y técnica de carrera (skipping, talones, progresivos) antes de las aceleraciones.',items:['calentOut','acel','saltoAdel','frenar','saltoLat']},
-  carrera:{name:'Carrera y saltos',time:'~60 min',pre:'Al aire libre y sin implementos, en pasto o cancha plana. 15 min de calentamiento y técnica de carrera (skipping, talones, progresivos) antes de las aceleraciones, y 5 min de trote suave al final.',items:['calentOut','acel','saltoAdel','frenar','frenado','interm']},
+  carrera:{name:'Carrera y saltos',time:'~60 min',pre:'Al aire libre y sin implementos, en pasto o cancha plana. 15 min de calentamiento y técnica de carrera (skipping, talones, progresivos) antes de las aceleraciones, y 5 min de trote suave al final.',items:['activAM','calentOut','acel','saltoAdel','frenar','frenado','interm']},
   piernaA:{name:'Pierna A',time:'~65 min',pre:'Pausa de 2–3 min en los dos primeros ejercicios y de 90 s en el resto.',items:['calent','pc','box','bulg','nordic','colgado']},
   aerobico:{name:'Aeróbico suave',time:'~45 min',items:['bici']},
   intermitente:{name:'Frenado e intermitente',slot:'AM',time:'~40 min',pre:'Al aire libre y sin implementos, en pasto o tierra. 5 min de trote suave antes y 5 min al final.',items:['calentOut','frenado','interm']},
@@ -426,7 +427,7 @@ const SESS = {
   fondo:{name:'Fondo largo',time:'',items:['fondo']},
   libre:{name:'Descanso',time:'',items:[]},
   rm:{name:'Día de RM',time:'~90 min',pre:'Sentadilla → banca → peso muerto, con 5–8 min entre intentos pesados. Subida 5 → 3 → 2 → 1 → 1: el último single con 1 repetición en reserva y sin intentos fallidos. Si en el calentamiento la rodilla pasa de 2/10, hoy solo banca.',items:['calent','rmSq','rmBp','rmDl']},
-  tests23:{name:'Sprint y 5 km',time:'~60 min',pre:'Solo con la rodilla en verde. Al aire libre, en plano.',items:['calentOut','sprintT','cincoT']},
+  tests23:{name:'Sprint y 5 km',time:'~60 min',pre:'Solo con la rodilla en verde. Al aire libre, en plano.',items:['activAM','calentOut','sprintT','cincoT']},
   fondoSuave:{name:'Trote suave',time:'~35 min',items:['fondoS']},
   cierre:{name:'Cierre del reto',time:'~40 min',items:['cierreC']},
   transA:{name:'Transición: cuerpo completo',time:'~50 min',pre:'Puente hacia el ciclo enero–febrero: todo liviano, para mover el cuerpo sin cansarlo.',items:['calent','transFB','transCore']},
@@ -768,7 +769,7 @@ function render(){
 function weekText(wk){ return wk < 1 ? 'Antes del reto' : wk <= BLOCK_WEEKS ? `Semana ${wk} de ${BLOCK_WEEKS}${isDeload(wk) ? ' · descarga' : ''}` : 'Reto terminado'; }
 function renderHeader(){
   const wk = weekOf(S.date);
-  { const n = dayNum(S.date), y = yearDay(S.date); $('#weekChip').textContent = y ? `Día ${y} de ${YEAR_DAYS} · faltan ${Math.max(0, YEAR_DAYS - y)}` : n < 1 ? 'El reto parte el mar 10 nov' : n <= TOTAL_DAYS ? `Día ${n} de ${TOTAL_DAYS} · faltan ${TOTAL_DAYS - n}` : S.date <= TRANS_END ? 'Transición al ciclo ene–feb' : 'Reto terminado'; }
+  { const n = dayNum(S.date), y = yearDay(S.date); $('#weekChip').textContent = y ? `Día ${y} de ${YEAR_DAYS} · faltan ${Math.max(0, YEAR_DAYS - y)}` : n < 1 ? 'El reto parte el mié 11 nov' : n <= TOTAL_DAYS ? `Día ${n} de ${TOTAL_DAYS} · faltan ${TOTAL_DAYS - n}` : S.date <= TRANS_END ? 'Transición al ciclo ene–feb' : 'Reto terminado'; }
 }
 function renderBanner(){
   let h = '';
