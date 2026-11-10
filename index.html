@@ -403,15 +403,15 @@ const EX = {
   rmSq:{name:'Sentadilla: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,knee:true,note:'A paralelo como mucho y con barras de seguridad.',sub:'hoy no: solo banca'},
   rmBp:{name:'Banca: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,note:'Con alguien que te asista.'},
   rmDl:{name:'Peso muerto: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,knee:true,note:'Con barra hexagonal si hay; si no, convencional.',sub:'hoy no: solo banca'},
-  activAM:{name:'Activación (mañana)',kind:'check',label:'2 rondas: 5 dominadas · 10 flexiones · 10 puentes de glúteo · 20 s de plancha. Liviano, dejando 4 o más repeticiones en reserva: mañana toca Torso B.'},
+  activAM:{name:'Rutina AM: dominadas, fondos, abs y parada de manos',kind:'check',label:'50 dominadas en series de 5 y 100 fondos en series de 10, dejando 2–3 repeticiones en reserva en cada serie · rutina de abs (~10 min) · 3 intentos de parada de manos al fallo, con 2 min de pausa.'},
   sprintT:{name:'Test: sprint de 10 m',kind:'check',label:'3 intentos con 3 min de pausa. Anota el mejor en Progreso → Tests.'},
   cincoT:{name:'Test: 5 km contra reloj',kind:'check',label:'10 min después del sprint, en plano. Anota el tiempo en Progreso → Tests.'},
-  fondoS:{name:'Trote muy suave',kind:'check',label:'30–35 min (5–6 km) o descanso si las piernas están cargadas: mañana es el día de RM.'},
-  transFB:{name:'Técnica liviana',kind:'check',label:'Sentadilla al cajón, press banca, remo con barra, peso muerto rumano y press militar: 2×5 cada uno al ~60% de tu RM técnico, dejando 4 repeticiones en reserva.'},
+  fondoS:{name:'Trote muy suave',kind:'check',label:'30–35 min (5–6 km) o descanso si las piernas están cargadas.'},
+  transFB:{name:'Técnica liviana',kind:'check',label:'Sentadilla, press banca, peso muerto, remo con barra y press militar: 2×5 cada uno al ~60% de tu carga habitual, dejando 4 repeticiones en reserva.'},
   transCore:{name:'Core y rodilla',kind:'check',label:'Plancha lateral 2×30 s por lado · Pallof press 2×10 por lado · extensión a una pierna 2×12 · gemelos 2×15.'},
   transRun:{name:'Trote suave',kind:'check',label:'30–40 min en plano, a ritmo de conversación.'},
   transMob:{name:'Movilidad',kind:'check',label:'15 min: cadera, tobillo y columna torácica.'},
-  cierreC:{name:'Movilidad y trote suave',kind:'check',label:'20 min de movilidad + 20–30 min de trote o bici suave. Día 50: listo.'},
+  cierreC:{name:'Movilidad y caminata',kind:'check',label:'20 min de movilidad + 20 min de caminata o bici suave. Mañana es el día de RM.'},
   saltoAdel:{name:'Salto largo a pies juntos',kind:'reps',sets:4,reps:3,repsLabel:'3 saltos',rest:90,note:'Desde quieto, cae en silencio y queda estable antes del siguiente.',knee:true,sub:'se saltan hoy'},
 };
 const KNEE_MINI = ['rod_ext','rod_step','rod_trineo','rod_cph','rod_gem'];
@@ -427,21 +427,22 @@ const SESS = {
   fondo:{name:'Fondo largo',time:'',items:['fondo']},
   libre:{name:'Descanso',time:'',items:[]},
   rm:{name:'Día de RM',time:'~90 min',pre:'Sentadilla → banca → peso muerto, con 5–8 min entre intentos pesados. Subida 5 → 3 → 2 → 1 → 1: el último single con 1 repetición en reserva y sin intentos fallidos. Si en el calentamiento la rodilla pasa de 2/10, hoy solo banca.',items:['calent','rmSq','rmBp','rmDl']},
-  tests23:{name:'Sprint y 5 km',time:'~60 min',pre:'Solo con la rodilla en verde. Al aire libre, en plano.',items:['activAM','calentOut','sprintT','cincoT']},
+  tests23:{name:'Sprint y 5 km',time:'~60 min',pre:'Solo con la rodilla en verde. Al aire libre, en plano.',items:['calentOut','sprintT','cincoT']},
   fondoSuave:{name:'Trote suave',time:'~35 min',items:['fondoS']},
-  cierre:{name:'Cierre del reto',time:'~40 min',items:['cierreC']},
+  cierre:{name:'Descanso activo',time:'~40 min',items:['cierreC']},
+  tecnica:{name:'Técnica antes del RM',time:'~50 min',pre:'Dos días antes del RM: todo liviano, para afinar la técnica sin cansarte.',items:['calent','transFB','transCore']},
   transA:{name:'Transición: cuerpo completo',time:'~50 min',pre:'Puente hacia el ciclo enero–febrero: todo liviano, para mover el cuerpo sin cansarlo.',items:['calent','transFB','transCore']},
   transB:{name:'Transición: trote y movilidad',time:'~50 min',pre:'Puente hacia el ciclo enero–febrero: aeróbico suave y movilidad.',items:['calentOut','transRun','transMob']},
 };
 const DAY_PLAN_OLD = {0:['fondo'],1:['torsoA'],2:['velocidad','piernaA'],3:['aerobico'],4:['intermitente','bisagra'],5:['torsoB'],6:['libre']};
 const PLAN_CHANGE = '2026-11-05'; // desde aquí: una sesión por día
 const DAY_PLAN_NEW = {0:['fondo'],1:['piernaA'],2:['torsoA'],3:['carrera'],4:['torsoB'],5:['bisagra'],6:['libre']};
-const DAY_OVERRIDE = {'2026-12-23':['tests23'], '2026-12-25':['libre'], '2026-12-27':['fondoSuave'], '2026-12-28':['rm'], '2026-12-29':['cierre'], '2026-12-30':['transA'], '2026-12-31':['transB'], '2027-01-01':['libre']};
+const DAY_OVERRIDE = {'2026-12-23':['tests23'], '2026-12-25':['libre'], '2026-12-27':['fondoSuave'], '2026-12-28':['tecnica'], '2026-12-29':['cierre'], '2026-12-30':['rm'], '2026-12-31':['transB'], '2027-01-01':['libre']};
 const TRANS_END = '2027-01-01';
 const YEAR_START = '2027-01-01';
 const yearDay = s => s >= YEAR_START ? daysBetween(YEAR_START, s) + 1 : 0;
 const YEAR_DAYS = 365;
-const TEST_NOTE = {'2026-12-21':'después del calentamiento, salto largo a pies juntos y extensión a una pierna. Anótalos en Progreso → Tests.', '2026-12-22':'dominada con +10 kg, repeticiones máximas, al inicio de la sesión.', '2026-12-24':'press militar 5RM, al inicio de la sesión.', '2026-12-28':'anota el mejor single de cada ejercicio en Progreso → Tests.'};
+const TEST_NOTE = {'2026-12-21':'después del calentamiento, salto largo a pies juntos y extensión a una pierna. Anótalos en Progreso → Tests.', '2026-12-22':'dominada con +10 kg, repeticiones máximas, al inicio de la sesión.', '2026-12-24':'press militar 5RM, al inicio de la sesión.', '2026-12-30':'anota el mejor single de cada ejercicio en Progreso → Tests.'};
 const dayPlan = date => DAY_OVERRIDE[date] || (date < PLAN_CHANGE ? DAY_PLAN_OLD : DAY_PLAN_NEW)[parse(date).getDay()];
 const INTERM = {1:'2×6 min',2:'2×7 min',3:'2×8 min',4:'2×6 min',5:'3×6 min',6:'3×7 min',7:'2×6 min'};
 const FONDO = {1:8,2:8,3:9,4:7,5:10,6:11,7:9};
@@ -1080,7 +1081,7 @@ function testVal(t, v){ if (v == null) return '—'; if (t.time) return mmss(v);
 function testsHTML(){
   const by = {}; S.tests.forEach((t, id) => { (by[t.test] = by[t.test] || []).push(Object.assign({id}, t)); });
   Object.values(by).forEach(a => a.sort((x, y) => y.date.localeCompare(x.date)));
-  let h = '<div class="card pad stack"><div class="stack-sm"><h2 class="h">Tests</h2><p class="muted">Semana 7: tests del 21 al 24 dic y día de RM el lunes 28. La primera vez es tu punto de partida.</p></div><div>';
+  let h = '<div class="card pad stack"><div class="stack-sm"><h2 class="h">Tests</h2><p class="muted">Semana 7: tests del 21 al 24 dic y día de RM el miércoles 30. La primera vez es tu punto de partida.</p></div><div>';
   TESTS.forEach(t => {
     const a = by[t.k] || []; const cur = a[0], prev = a[1];
     let delta = '';
