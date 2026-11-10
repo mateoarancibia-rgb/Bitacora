@@ -358,7 +358,7 @@ const WEEK0 = '2026-11-09';           // lunes de la semana 1 (semanas de lunes 
 const TOTAL_DAYS = 50;
 const dayNum = s => daysBetween(START, s) + 1;
 const BLOCK_WEEKS = 7;
-const DELOAD = [4, 7];
+const DELOAD = [4];
 const isDeload = wk => DELOAD.includes(wk);
 const BW_DEFAULT = 72;
 const GROUP_KNEE = 'Mini-sesión de rodilla';
@@ -403,7 +403,10 @@ const EX = {
   rmSq:{name:'Sentadilla: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,knee:true,note:'A paralelo como mucho y con barras de seguridad.',sub:'hoy no: solo banca'},
   rmBp:{name:'Banca: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,note:'Con alguien que te asista.'},
   rmDl:{name:'Peso muerto: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,knee:true,note:'Con barra hexagonal si hay; si no, convencional.',sub:'hoy no: solo banca'},
-  activAM:{name:'Rutina AM: dominadas, fondos, abs y parada de manos',kind:'check',label:'50 dominadas en series de 5 y 100 fondos en series de 10, dejando 2–3 repeticiones en reserva en cada serie · rutina de abs (~10 min) · 3 intentos de parada de manos al fallo, con 2 min de pausa.'},
+  amDom:{name:'AM · Dominadas',kind:'reps',sets:10,reps:5,rest:60,note:'Deja 2–3 repeticiones en reserva en cada serie. Ajusta series y repeticiones como te acomode.'},
+  amFon:{name:'AM · Fondos',kind:'reps',sets:10,reps:10,rest:60,note:'Deja 2–3 repeticiones en reserva en cada serie.'},
+  amAbs:{name:'AM · Rutina de abs',kind:'check',label:'~10 min.'},
+  amHS:{name:'AM · Parada de manos',kind:'reps',sets:3,reps:30,repsLabel:'máx. segundos',repsUnit:'s',rest:120,note:'Anota los segundos de cada intento.'},
   sprintT:{name:'Test: sprint de 10 m',kind:'check',label:'3 intentos con 3 min de pausa. Anota el mejor en Progreso → Tests.'},
   cincoT:{name:'Test: 5 km contra reloj',kind:'check',label:'10 min después del sprint, en plano. Anota el tiempo en Progreso → Tests.'},
   fondoS:{name:'Trote muy suave',kind:'check',label:'30–35 min (5–6 km) o descanso si las piernas están cargadas.'},
@@ -418,7 +421,7 @@ const KNEE_MINI = ['rod_ext','rod_step','rod_trineo','rod_cph','rod_gem'];
 const SESS = {
   torsoA:{name:'Torso A',time:'~65 min',items:['calent','banca','dom_lastre','remo','vuelos','rueda','cuello',...KNEE_MINI]},
   velocidad:{name:'Velocidad y saltos',slot:'AM',time:'~45 min',pre:'Al aire libre y sin implementos: basta un pasto o una cancha plana. 15 min de calentamiento y técnica de carrera (skipping, talones, progresivos) antes de las aceleraciones.',items:['calentOut','acel','saltoAdel','frenar','saltoLat']},
-  carrera:{name:'Carrera y saltos',time:'~60 min',pre:'Al aire libre y sin implementos, en pasto o cancha plana. 15 min de calentamiento y técnica de carrera (skipping, talones, progresivos) antes de las aceleraciones, y 5 min de trote suave al final.',items:['activAM','calentOut','acel','saltoAdel','frenar','frenado','interm']},
+  carrera:{name:'Carrera y saltos',time:'~60 min',pre:'Al aire libre y sin implementos, en pasto o cancha plana. 15 min de calentamiento y técnica de carrera (skipping, talones, progresivos) antes de las aceleraciones, y 5 min de trote suave al final.',items:['amDom','amFon','amAbs','amHS','calentOut','acel','saltoAdel','frenar','frenado','interm']},
   piernaA:{name:'Pierna A',time:'~65 min',pre:'Pausa de 2–3 min en los dos primeros ejercicios y de 90 s en el resto.',items:['calent','pc','box','bulg','nordic','colgado']},
   aerobico:{name:'Aeróbico suave',time:'~45 min',items:['bici']},
   intermitente:{name:'Frenado e intermitente',slot:'AM',time:'~40 min',pre:'Al aire libre y sin implementos, en pasto o tierra. 5 min de trote suave antes y 5 min al final.',items:['calentOut','frenado','interm']},
@@ -444,8 +447,8 @@ const yearDay = s => s >= YEAR_START ? daysBetween(YEAR_START, s) + 1 : 0;
 const YEAR_DAYS = 365;
 const TEST_NOTE = {'2026-12-21':'después del calentamiento, salto largo a pies juntos y extensión a una pierna. Anótalos en Progreso → Tests.', '2026-12-22':'dominada con +10 kg, repeticiones máximas, al inicio de la sesión.', '2026-12-24':'press militar 5RM, al inicio de la sesión.', '2026-12-30':'anota el mejor single de cada ejercicio en Progreso → Tests.'};
 const dayPlan = date => DAY_OVERRIDE[date] || (date < PLAN_CHANGE ? DAY_PLAN_OLD : DAY_PLAN_NEW)[parse(date).getDay()];
-const INTERM = {1:'2×6 min',2:'2×7 min',3:'2×8 min',4:'2×6 min',5:'3×6 min',6:'3×7 min',7:'2×6 min'};
-const FONDO = {1:8,2:8,3:9,4:7,5:10,6:11,7:9};
+const INTERM = {1:'2×6 min',2:'2×7 min',3:'2×8 min',4:'2×6 min',5:'3×6 min',6:'3×7 min',7:'3×8 min'};
+const FONDO = {1:8,2:8,3:9,4:7,5:10,6:11,7:12};
 const CTYPES = [
   {k:'fondo',name:'Fondo largo',run:true},
   {k:'suave',name:'Trote suave',run:true},
