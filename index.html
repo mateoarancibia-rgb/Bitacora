@@ -353,7 +353,7 @@ body.ro main input,body.ro main textarea{pointer-events:none;opacity:.7}
 'use strict';
 
 /* ---------------- Plan del bloque 1 ---------------- */
-const START = '2026-11-11';           // miércoles: día 1 del reto de 50 días (hasta el 30 dic)
+const START = '2026-11-12';           // jueves: día 1 del reto de 50 días (hasta el 31 dic)
 const WEEK0 = '2026-11-09';           // lunes de la semana 1 (semanas de lunes a domingo)
 const TOTAL_DAYS = 50;
 const dayNum = s => daysBetween(START, s) + 1;
@@ -779,7 +779,7 @@ function render(){
 function weekText(wk){ return wk < 1 ? 'Antes del reto' : wk <= BLOCK_WEEKS ? `Semana ${wk} de ${BLOCK_WEEKS}${isDeload(wk) ? ' · descarga' : ''}` : 'Reto terminado'; }
 function renderHeader(){
   const wk = weekOf(S.date);
-  { const n = dayNum(S.date), y = yearDay(S.date); $('#weekChip').textContent = y ? `Día ${y} de ${YEAR_DAYS} · faltan ${Math.max(0, YEAR_DAYS - y)}` : n < 1 ? 'El reto parte el mié 11 nov' : n <= TOTAL_DAYS ? `Día ${n} de ${TOTAL_DAYS} · faltan ${TOTAL_DAYS - n}` : S.date <= TRANS_END ? 'Transición al ciclo ene–feb' : 'Reto terminado'; }
+  { const n = dayNum(S.date), y = yearDay(S.date); $('#weekChip').textContent = y ? `Día ${y} de ${YEAR_DAYS} · faltan ${Math.max(0, YEAR_DAYS - y)}` : n < 1 ? 'El reto parte el jue 12 nov' : n <= TOTAL_DAYS ? `Día ${n} de ${TOTAL_DAYS} · faltan ${TOTAL_DAYS - n}` : S.date <= TRANS_END ? 'Transición al ciclo ene–feb' : 'Reto terminado'; }
 }
 function renderBanner(){
   let h = '';
