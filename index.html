@@ -353,11 +353,11 @@ body.ro main input,body.ro main textarea{pointer-events:none;opacity:.7}
 'use strict';
 
 /* ---------------- Plan del bloque 1 ---------------- */
-const START = '2026-11-12';           // jueves: día 1 del reto de 50 días (hasta el 31 dic)
-const WEEK0 = '2026-11-09';           // lunes de la semana 1 (semanas de lunes a domingo)
-const TOTAL_DAYS = 50;
+const START = '2026-11-13';           // viernes: día 1 del reto de 49 días (13–15 nov son días base; hasta el 31 dic)
+const WEEK0 = '2026-11-16';           // lunes de la semana 1 (semanas de lunes a domingo)
+const TOTAL_DAYS = 49;
 const dayNum = s => daysBetween(START, s) + 1;
-const BLOCK_WEEKS = 7;
+const BLOCK_WEEKS = 6;
 const DELOAD = [];
 const isDeload = wk => DELOAD.includes(wk);
 const BW_DEFAULT = 72;
@@ -453,8 +453,8 @@ const yearDay = s => s >= YEAR_START ? daysBetween(YEAR_START, s) + 1 : 0;
 const YEAR_DAYS = 365;
 const TEST_NOTE = {'2026-12-27':'5 km contra reloj en vez del fondo. Anota el tiempo en Progreso → Tests.', '2026-12-28':'día de tests. Anota cada resultado en Progreso → Tests.', '2026-12-30':'anota el mejor single de cada ejercicio en Progreso → Tests.'};
 const dayPlan = date => DAY_OVERRIDE[date] || (date < PLAN_CHANGE ? DAY_PLAN_OLD : DAY_PLAN_NEW)[parse(date).getDay()];
-const INTERM = {1:'2×6 min',2:'2×7 min',3:'2×8 min',4:'3×6 min',5:'3×7 min',6:'3×8 min',7:'3×8 min'};
-const FONDO = {1:8,2:8,3:9,4:10,5:10,6:11,7:12};
+const INTERM = {1:'2×6 min',2:'2×7 min',3:'2×8 min',4:'3×6 min',5:'3×7 min',6:'3×8 min'};
+const FONDO = {1:8,2:9,3:10,4:10,5:11,6:12};
 const CTYPES = [
   {k:'fondo',name:'Fondo largo',run:true},
   {k:'suave',name:'Trote suave',run:true},
@@ -776,17 +776,17 @@ function render(){
   const fn = {hoy:viewHoy, rodilla:viewRodilla, trote:viewTrote, progreso:viewProgreso, historial:viewHistorial}[S.view];
   $('#v-' + S.view).innerHTML = fn();
 }
-function weekText(wk){ return wk < 1 ? 'Antes del reto' : wk <= BLOCK_WEEKS ? `Semana ${wk} de ${BLOCK_WEEKS}${isDeload(wk) ? ' · descarga' : ''}` : 'Reto terminado'; }
+function weekText(wk){ return wk < 1 ? 'Días base' : wk <= BLOCK_WEEKS ? `Semana ${wk} de ${BLOCK_WEEKS}${isDeload(wk) ? ' · descarga' : ''}` : 'Reto terminado'; }
 function renderHeader(){
   const wk = weekOf(S.date);
-  { const n = dayNum(S.date), y = yearDay(S.date); $('#weekChip').textContent = y ? `Día ${y} de ${YEAR_DAYS} · faltan ${Math.max(0, YEAR_DAYS - y)}` : n < 1 ? 'El reto parte el jue 12 nov' : n <= TOTAL_DAYS ? `Día ${n} de ${TOTAL_DAYS} · faltan ${TOTAL_DAYS - n}` : S.date <= TRANS_END ? 'Transición al ciclo ene–feb' : 'Reto terminado'; }
+  { const n = dayNum(S.date), y = yearDay(S.date); $('#weekChip').textContent = y ? `Día ${y} de ${YEAR_DAYS} · faltan ${Math.max(0, YEAR_DAYS - y)}` : n < 1 ? 'El reto parte el vie 13 nov' : n <= TOTAL_DAYS ? `Día ${n} de ${TOTAL_DAYS} · faltan ${TOTAL_DAYS - n}` : S.date <= TRANS_END ? 'Transición al ciclo ene–feb' : 'Reto terminado'; }
 }
 function renderBanner(){
   let h = '';
   if (S.mode === 'local') h = '';
   else if (S.mode === 'readonly') h = '<div class="banner"><b>Solo lectura.</b> Puedes ver los registros, pero no editarlos.</div>';
   else if (S.stale) h = '<div class="banner"><b>Todavía no conecto con la nube.</b> Lo que ves puede estar desactualizado; tus cambios se guardan apenas vuelva la conexión.</div>';
-  else if (weekOf(S.date) > BLOCK_WEEKS && S.view === 'hoy') h = '<div class="banner"><b>Terminaste los 50 días.</b> ' + (S.date <= TRANS_END ? 'Hasta el 1 de enero son días de transición, livianos, para llegar fresco al ciclo enero–febrero.' : 'Pídele a Claude el ciclo enero–febrero; mientras tanto, las sesiones siguen con la misma estructura.') + '</div>';
+  else if (weekOf(S.date) > BLOCK_WEEKS && S.view === 'hoy') h = '<div class="banner"><b>Terminaste los 49 días.</b> ' + (S.date <= TRANS_END ? 'Hasta el 1 de enero son días de transición, livianos, para llegar fresco al ciclo enero–febrero.' : 'Pídele a Claude el ciclo enero–febrero; mientras tanto, las sesiones siguen con la misma estructura.') + '</div>';
   $('#banner').innerHTML = h;
 }
 function dateNav(){
