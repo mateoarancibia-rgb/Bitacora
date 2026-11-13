@@ -626,7 +626,7 @@ function pruneDrafts(){ [...S.drafts.keys()].forEach(id => { if (!timers.has(id)
 
 /* ---------------- Datos derivados ---------------- */
 function allSessionEntries(){ const m = new Map(S.sessions); S.drafts.forEach((v, k) => m.set(k, v)); return [...m.entries()]; }
-const allSessions = () => allSessionEntries().map(e => e[1]);
+const allSessions = () => allSessionEntries().map(e => e[1]).filter(x => x && x.date >= START);
 function hasDone(it, ex){
   if (!it || !ex) return false;
   if (it.sets) return it.sets.some(x => x.done);
