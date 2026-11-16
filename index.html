@@ -353,9 +353,9 @@ body.ro main input,body.ro main textarea{pointer-events:none;opacity:.7}
 'use strict';
 
 /* ---------------- Plan del bloque 1 ---------------- */
-const START = '2026-11-13';           // viernes: día 1 del reto de 49 días (13–15 nov son días base; hasta el 31 dic)
+const START = '2026-11-16';           // lunes: día 1 del reto de 46 días (hasta el 31 dic)
 const WEEK0 = '2026-11-16';           // lunes de la semana 1 (semanas de lunes a domingo)
-const TOTAL_DAYS = 49;
+const TOTAL_DAYS = 46;
 const dayNum = s => daysBetween(START, s) + 1;
 const BLOCK_WEEKS = 6;
 const DELOAD = [];
@@ -779,14 +779,14 @@ function render(){
 function weekText(wk){ return wk < 1 ? 'Días base' : wk <= BLOCK_WEEKS ? `Semana ${wk} de ${BLOCK_WEEKS}${isDeload(wk) ? ' · descarga' : ''}` : 'Reto terminado'; }
 function renderHeader(){
   const wk = weekOf(S.date);
-  { const n = dayNum(S.date), y = yearDay(S.date); $('#weekChip').textContent = y ? `Día ${y} de ${YEAR_DAYS} · faltan ${Math.max(0, YEAR_DAYS - y)}` : n < 1 ? 'El reto parte el vie 13 nov' : n <= TOTAL_DAYS ? `Día ${n} de ${TOTAL_DAYS} · faltan ${TOTAL_DAYS - n}` : S.date <= TRANS_END ? 'Transición al ciclo ene–feb' : 'Reto terminado'; }
+  { const n = dayNum(S.date), y = yearDay(S.date); $('#weekChip').textContent = y ? `Día ${y} de ${YEAR_DAYS} · faltan ${Math.max(0, YEAR_DAYS - y)}` : n < 1 ? 'El reto parte el lun 16 nov' : n <= TOTAL_DAYS ? `Día ${n} de ${TOTAL_DAYS} · faltan ${TOTAL_DAYS - n}` : S.date <= TRANS_END ? 'Transición al ciclo ene–feb' : 'Reto terminado'; }
 }
 function renderBanner(){
   let h = '';
   if (S.mode === 'local') h = '';
   else if (S.mode === 'readonly') h = '<div class="banner"><b>Solo lectura.</b> Puedes ver los registros, pero no editarlos.</div>';
   else if (S.stale) h = '<div class="banner"><b>Todavía no conecto con la nube.</b> Lo que ves puede estar desactualizado; tus cambios se guardan apenas vuelva la conexión.</div>';
-  else if (weekOf(S.date) > BLOCK_WEEKS && S.view === 'hoy') h = '<div class="banner"><b>Terminaste los 49 días.</b> ' + (S.date <= TRANS_END ? 'Hasta el 1 de enero son días de transición, livianos, para llegar fresco al ciclo enero–febrero.' : 'Pídele a Claude el ciclo enero–febrero; mientras tanto, las sesiones siguen con la misma estructura.') + '</div>';
+  else if (weekOf(S.date) > BLOCK_WEEKS && S.view === 'hoy') h = '<div class="banner"><b>Terminaste los 46 días.</b> ' + (S.date <= TRANS_END ? 'Hasta el 1 de enero son días de transición, livianos, para llegar fresco al ciclo enero–febrero.' : 'Pídele a Claude el ciclo enero–febrero; mientras tanto, las sesiones siguen con la misma estructura.') + '</div>';
   $('#banner').innerHTML = h;
 }
 function dateNav(){
