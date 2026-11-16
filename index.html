@@ -1074,14 +1074,14 @@ function sleepHTML(){
   const t = todayISO(); const end = S.date < t ? S.date : t;
   const rows = Array.from({length:28}, (_, i) => { const d = addDays(end, i - 27); const b = bodyRec(d); return {d, h:sleepOf(d), q:(b && b.quality) || null}; }).filter(r => r.d >= START);
   const got = rows.filter(r => r.h != null);
-  let h = `<div class="card pad stack"><div class="stack-sm"><h2 class="h">Sueño</h2><p class="muted">Meta: ${SLEEP_GOAL} h todas las noches, acostándote y levantándote a la misma hora. Si duermes menos de 6 h antes de un día de pierna o carrera, repite cargas en vez de subir.</p></div>`;
+  let h = `<div class="card pad stack"><div class="stack-sm"><h2 class="h">Sueño</h2><p class="muted">Mínimo ${SLEEP_GOAL} h todas las noches, acostándote y levantándote a la misma hora. Si duermes menos de 6 h antes de un día de pierna o carrera, repite cargas en vez de subir.</p></div>`;
   if (!got.length) return h + '<div class="empty"><b>Sin noches registradas.</b><p>Anota en Hoy cuántas horas dormiste y cómo dormiste.</p></div></div>';
   const wk = rows.slice(-7).filter(r => r.h != null);
   const ok = wk.filter(r => r.h >= SLEEP_LOW).length;
   const last = got[got.length - 1];
   const lastTxt = `última: ${fmt(last.h)} h${last.q ? `, durmió ${QUAL[last.q].toLowerCase()}` : ''} (${shortDay(last.d)})`;
   h += `<div class="kpi"><span class="label">Promedio de las últimas 7 noches</span><b class="big">${wk.length ? `${fmt(round1(avg(wk.map(r => r.h))))} h` : '—'}</b><p class="muted sm">${esc(wk.length ? `${ok} de ${wk.length} ${wk.length === 1 ? 'noche' : 'noches'} con ${SLEEP_LOW} h o más · ${lastTxt}` : `Sin registros esta última semana · ${lastTxt}`)}</p></div>`;
-  h += `<div class="legend"><span><i class="sw"></i>${SLEEP_LOW} h o más</span><span><i class="sw short"></i>Menos de ${SLEEP_LOW} h</span><span><i class="sw plan"></i>Meta ${SLEEP_GOAL} h</span></div>`;
+  h += `<div class="legend"><span><i class="sw"></i>${SLEEP_LOW} h o más</span><span><i class="sw short"></i>Menos de ${SLEEP_LOW} h</span><span><i class="sw plan"></i>Mínimo ${SLEEP_GOAL} h</span></div>`;
   h += sleepChart(rows);
   h += dataTable(['Fecha','Horas','Calidad'], got.slice().reverse().map(r => [shortDay(r.d) + ' ' + MON[parse(r.d).getMonth()], `${fmt(r.h)} h`, r.q ? QUAL[r.q] : '—']));
   return h + '</div>';
