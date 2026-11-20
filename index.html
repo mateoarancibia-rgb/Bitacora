@@ -398,7 +398,9 @@ const EX = {
   militar:{name:'Press militar estricto',short:'Militar',kind:'load',sets:4,reps:5,rir:3,start:37.5,step:1.25,rest:120,lift:true},
   supinas:{name:'Dominadas supinas',kind:'reps',sets:3,reps:6,repsLabel:'6–8',rest:90,note:'Peso corporal, bajando en 3 s.'},
   fondos:{name:'Fondos lastrados',short:'Fondos +kg',kind:'added',sets:4,reps:5,repsLabel:'5–6',rir:2,start:7.5,step:2.5,rest:120,lift:true,note:'Mancuerna entre las rodillas o mochila con discos.'},
-  pallof:{name:'Pallof press',kind:'reps',sets:3,reps:10,repsLabel:'10 por lado',rest:45},
+  pallof:{name:'Pallof press',short:'Pallof',kind:'load',sets:3,reps:12,repsLabel:'12 por lado',start:10,step:2.5,rest:60,note:'Peso ajustable en la polea. Tronco quieto, sin girar.'},
+  curl:{name:'Curl de bíceps',short:'Curl',kind:'load',sets:3,reps:12,rir:2,start:10,step:1,rest:60,note:'Peso ajustable. Sube controlado y baja en 2–3 s.'},
+  curlM:{name:'Curl martillo',short:'Martillo',kind:'load',sets:3,reps:12,rir:2,start:8,step:1,rest:60,note:'Peso ajustable. Agarre neutro, sin balancear el torso.'},
   fondo:{name:'Fondo largo suave',kind:'cardio',ctype:'fondo',note:'A ritmo de conversación, pasos cortos, en tierra o pasto si puedes.',knee:true,sub:'bici o elíptica, el mismo tiempo'},
   rmSq:{name:'Sentadilla: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,knee:true,note:'A paralelo como mucho y con barras de seguridad.',sub:'hoy no: solo banca'},
   rmBp:{name:'Banca: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,note:'Con alguien que te asista.'},
@@ -423,14 +425,14 @@ const EX = {
 };
 const KNEE_MINI = ['rod_ext','rod_step','rod_trineo','rod_cph','rod_gem'];
 const SESS = {
-  torsoA:{name:'Torso A',time:'~65 min',items:['calent','banca','dom_lastre','remo','vuelos','rueda','cuello',...KNEE_MINI]},
+  torsoA:{name:'Torso A',time:'~65 min',items:['calent','banca','dom_lastre','remo','curlM','vuelos','rueda','cuello',...KNEE_MINI]},
   velocidad:{name:'Velocidad y saltos',slot:'AM',time:'~45 min',pre:'Al aire libre y sin implementos: basta un pasto o una cancha plana. 15 min de calentamiento y técnica de carrera (skipping, talones, progresivos) antes de las aceleraciones.',items:['calentOut','acel','saltoAdel','frenar','saltoLat']},
   carrera:{name:'Carrera y saltos',time:'~60 min',pre:'Al aire libre y sin implementos, en pasto o cancha plana. 15 min de calentamiento y técnica de carrera (skipping, talones, progresivos) antes de las aceleraciones, y 5 min de trote suave al final.',items:['amDom','amFon','amAbs','amHS','calentOut','acel','saltoAdel','frenar','frenado','interm']},
   piernaA:{name:'Pierna A',time:'~65 min',pre:'Pausa de 2–3 min en los dos primeros ejercicios y de 90 s en el resto.',items:['calent','pc','box','bulg','nordic','colgado']},
   aerobico:{name:'Aeróbico suave',time:'~45 min',items:['bici']},
   intermitente:{name:'Frenado e intermitente',slot:'AM',time:'~40 min',pre:'Al aire libre y sin implementos, en pasto o tierra. 5 min de trote suave antes y 5 min al final.',items:['calentOut','frenado','interm']},
   bisagra:{name:'Pierna B',time:'~65 min',items:['calent','snatch','pp','rdl','hip','granjero']},
-  torsoB:{name:'Torso B',time:'~65 min',items:['calent','militar','supinas','fondos','pallof','cuello',...KNEE_MINI]},
+  torsoB:{name:'Torso B',time:'~65 min',items:['calent','militar','supinas','fondos','curl','pallof','cuello',...KNEE_MINI]},
   fondo:{name:'Fondo largo',time:'',items:['fondo']},
   libre:{name:'Descanso',time:'',items:[]},
   rm:{name:'Día de RM',time:'~90 min',pre:'Sentadilla → banca → peso muerto, con 5–8 min entre intentos pesados. Subida 5 → 3 → 2 → 1 → 1: el último single con 1 repetición en reserva y sin intentos fallidos. Si en el calentamiento la rodilla pasa de 2/10, hoy solo banca.',items:['calent','rmSq','rmBp','rmDl']},
@@ -446,7 +448,7 @@ const SESS = {
 const DAY_PLAN_OLD = {0:['fondo'],1:['torsoA'],2:['velocidad','piernaA'],3:['aerobico'],4:['intermitente','bisagra'],5:['torsoB'],6:['libre']};
 const PLAN_CHANGE = '2026-11-05'; // desde aquí: una sesión por día
 const DAY_PLAN_NEW = {0:['fondo'],1:['piernaA'],2:['torsoA'],3:['carrera'],4:['torsoB'],5:['bisagra'],6:['libre']};
-const DAY_OVERRIDE = {'2026-12-27':['test5k'], '2026-12-28':['testsDia'], '2026-12-29':['cierre'], '2026-12-30':['rm'], '2026-12-31':['transB'], '2027-01-01':['libre']};
+const DAY_OVERRIDE = {'2026-11-20':['libre'], '2026-11-21':['bisagra'], '2026-12-27':['test5k'], '2026-12-28':['testsDia'], '2026-12-29':['cierre'], '2026-12-30':['rm'], '2026-12-31':['transB'], '2027-01-01':['libre']};
 const TRANS_END = '2027-01-01';
 const YEAR_START = '2027-01-01';
 const yearDay = s => s >= YEAR_START ? daysBetween(YEAR_START, s) + 1 : 0;
@@ -1326,6 +1328,7 @@ function onClick(e){
     case 'savetest': saveTest(); break;
     case 'copysum': copySummary(); break;
     case 'fotodel': delFoto(S.date); break;
+    case 'fotoprev': restoreFoto(S.date); break;
     case 'gofoto': changeDate(b.dataset.d); location.hash = '#hoy'; break;
     case 'export': exportBackup(); break;
     case 'more': S.histLimit += 60; render(); break;
@@ -1544,7 +1547,7 @@ function importBackup(file){
     COLS.concat(['settings']).forEach(col => { const src = d[col]; if (!src || typeof src !== 'object') return; cur[col] = cur[col] || {};
       Object.entries(src).forEach(([id, v]) => { const c = cur[col][id]; if (v && (!c || (v.updatedAt || '') >= (c.updatedAt || ''))) { cur[col][id] = v; n++; } }); });
     if (!Local.write(cur)) { toast('No se pudo guardar el respaldo en este teléfono.'); return; }
-    if (d.fotos && typeof d.fotos === 'object') Object.entries(d.fotos).forEach(([k, v]) => { if (v && v.thumb) { Fotos.set(k, v).catch(() => {}); S.thumbs.set(k, v.thumb); } });
+    if (d.fotos && typeof d.fotos === 'object') Object.entries(d.fotos).forEach(([k, v]) => { if (v && v.thumb) { Fotos.set(k, v).catch(() => {}); if (k.startsWith('prev:')) S.prev.add(k.slice(5)); else S.thumbs.set(k, v.thumb); } });
     goLocal(); render(); toast(`Respaldo importado: ${n} ${n === 1 ? 'registro' : 'registros'}.`);
   };
   r.readAsText(file);
@@ -1560,9 +1563,9 @@ const Fotos = (() => {
   const tx = (mode, fn) => open().then(db => new Promise((res, rej) => { const t = db.transaction('fotos', mode); const req = fn(t.objectStore('fotos')); t.oncomplete = () => res(req && req.result); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error); }));
   return { get:k => tx('readonly', s => s.get(k)), set:(k, v) => tx('readwrite', s => s.put(v, k)), del:k => tx('readwrite', s => s.delete(k)), keys:() => tx('readonly', s => s.getAllKeys()) };
 })();
-S.thumbs = new Map(); S.fullFoto = new Map(); S.fotosReady = false;
+S.thumbs = new Map(); S.fullFoto = new Map(); S.prev = new Set(); S.fotosReady = false;
 async function loadThumbs(){
-  try { const ks = await Fotos.keys(); for (const k of ks) { const v = await Fotos.get(k); if (v && v.thumb) S.thumbs.set(k, v.thumb); } } catch (e) {}
+  try { const ks = await Fotos.keys(); for (const k of ks) { if (String(k).startsWith('prev:')) { S.prev.add(String(k).slice(5)); continue; } const v = await Fotos.get(k); if (v && v.thumb) S.thumbs.set(k, v.thumb); } } catch (e) {}
   S.fotosReady = true; scheduleRender();
 }
 function shrink(file, max, q){
@@ -1578,13 +1581,26 @@ async function saveFoto(date, file){
   try {
     toast('Guardando foto…');
     const full = await shrink(file, 1280, 0.82), thumb = await shrink(file, 300, 0.75);
+    await keepPrev(date);
     await Fotos.set(date, {date, full, thumb, savedAt:new Date().toISOString()});
     S.fullFoto.set(date, full); S.thumbs.set(date, thumb); render(); toast('Foto guardada');
   } catch (e) { toast('No se pudo guardar la foto. Prueba con otra.'); }
 }
+async function keepPrev(date){
+  try { const old = await Fotos.get(date); if (old && old.thumb) { await Fotos.set('prev:' + date, old); S.prev.add(date); } } catch (e) {}
+}
 async function delFoto(date){
+  await keepPrev(date);
   try { await Fotos.del(date); } catch (e) {}
-  S.fullFoto.delete(date); S.thumbs.delete(date); render(); toast('Foto quitada');
+  S.fullFoto.delete(date); S.thumbs.delete(date); render(); toast('Foto quitada. Puedes recuperarla.');
+}
+async function restoreFoto(date){
+  try {
+    const old = await Fotos.get('prev:' + date); if (!old || !old.thumb) { toast('No hay foto anterior.'); return; }
+    await keepPrev(date);
+    await Fotos.set(date, old); S.thumbs.set(date, old.thumb); S.fullFoto.set(date, old.full);
+    await Fotos.del('prev:' + date); S.prev.delete(date); render(); toast('Foto anterior recuperada');
+  } catch (e) { toast('No se pudo recuperar la foto.'); }
 }
 function fotoCardHTML(date){
   if (dayNum(date) < 1) return '';
@@ -1593,7 +1609,7 @@ function fotoCardHTML(date){
   const src = S.fullFoto.get(date) || S.thumbs.get(date) || '';
   return `<div class="card pad stack" id="fotoCard"><div class="row between"><span class="label">Foto del día ${dayNum(date) <= TOTAL_DAYS ? `· ${dayNum(date)} de ${TOTAL_DAYS}` : ''}</span>${has ? '<button class="btn sm ghost" type="button" data-act="fotodel">Quitar</button>' : ''}</div>
     ${has ? `<img class="foto" id="fotoImg" src="${src}" alt="Foto del ${esc(dayLabel(date).toLowerCase())}">` : '<label class="foto-empty" for="fotoIn">Toca para agregar la foto de hoy</label>'}
-    ${has ? '<label class="btn block" for="fotoIn">Cambiar foto</label>' : ''}<input type="file" id="fotoIn" accept="image/*" hidden></div>`;
+    ${has ? '<label class="btn block" for="fotoIn">Cambiar foto</label>' : ''}${S.prev.has(date) ? '<button class="btn block ghost" type="button" data-act="fotoprev">Recuperar la foto anterior</button>' : ''}<input type="file" id="fotoIn" accept="image/*" hidden></div>`;
 }
 function fotosHTML(){
   const ds = [...S.thumbs.keys()].filter(d => d >= START).sort().reverse();
