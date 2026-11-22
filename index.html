@@ -125,7 +125,7 @@ textarea{padding:10px 12px;resize:vertical}
 .stepper.mini output b{font-size:26px;margin:0}
 .vals{font-weight:700}
 .lnk{color:var(--accent);font-weight:600;text-decoration:none;white-space:nowrap}
-#pesoCard,#cform{scroll-margin-top:84px}
+#pesoCard,#cform,#fotoCard{scroll-margin-top:84px}
 .foto{width:100%;max-height:440px;object-fit:cover;border-radius:12px;display:block;background:var(--surface-2)}
 .foto-empty{display:flex;align-items:center;justify-content:center;min-height:120px;border:2px dashed var(--line);border-radius:12px;color:var(--muted);font-weight:600}
 .fotogrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
@@ -183,6 +183,12 @@ textarea{padding:10px 12px;resize:vertical}
 .group{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 16px;background:var(--sunk);border-bottom:1px solid var(--line);font-size:13px}
 .ex{display:flex;flex-direction:column;gap:10px;padding:14px 16px 16px;border-bottom:1px solid var(--line)}
 .ex.skip{opacity:.55}
+.pair{border-left:4px solid var(--accent);border-bottom:1px solid var(--line)}
+.pair .ex:last-child{border-bottom:0}
+.pair-head{display:flex;flex-direction:column;gap:2px;padding:10px 16px 10px 12px;background:var(--accent-soft);border-bottom:1px solid var(--line);font-size:13.5px;line-height:1.35}
+.pair-head .label{color:var(--accent)}
+.pair .ex{padding-left:12px}
+.tag{display:inline-block;min-width:26px;margin-right:7px;padding:1px 6px;border-radius:6px;background:var(--accent);color:var(--accent-ink);font-size:12.5px;font-weight:800;text-align:center;vertical-align:2px}
 .ex-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .ex-title{min-width:0}
 .ex h3{font-size:17px;font-weight:700;line-height:1.2}
@@ -353,11 +359,11 @@ body.ro main input,body.ro main textarea{pointer-events:none;opacity:.7}
 'use strict';
 
 /* ---------------- Plan del bloque 1 ---------------- */
-const START = '2026-11-16';           // lunes: día 1 del reto de 46 días (hasta el 31 dic)
-const WEEK0 = '2026-11-16';           // lunes de la semana 1 (semanas de lunes a domingo)
-const TOTAL_DAYS = 46;
+const START = '2026-11-23';           // lunes: día 1 del reto de 39 días (hasta el 31 dic)
+const WEEK0 = '2026-11-23';           // lunes de la semana 1 (semanas de lunes a domingo)
+const TOTAL_DAYS = 39;
 const dayNum = s => daysBetween(START, s) + 1;
-const BLOCK_WEEKS = 6;
+const BLOCK_WEEKS = 5;
 const DELOAD = [];
 const isDeload = wk => DELOAD.includes(wk);
 const BW_DEFAULT = 72;
@@ -376,7 +382,7 @@ const EX = {
   rod_step:{name:'Step-down lateral',kind:'check',label:'3×8 por lado desde cajón de 15–20 cm, bajando en 3 s',group:GROUP_KNEE},
   rod_trineo:{name:'Trineo hacia atrás',kind:'check',label:'4×20 m (sin trineo: cinta hacia atrás 4×1 min)',group:GROUP_KNEE},
   rod_cph:{name:'Plancha Copenhagen',kind:'check',label:'2×20 s por lado',group:GROUP_KNEE},
-  rod_gem:{name:'Gemelos, pierna recta y flexionada',kind:'check',label:'3×12–15 cada uno',group:GROUP_KNEE},
+  rod_gem:{name:'Gemelos, pierna recta y flexionada',kind:'check',label:'4 series de 12–15: 2 con la pierna recta y 2 flexionada',group:GROUP_KNEE},
   acel:{name:'Aceleraciones en plano',kind:'count',target:6,target3:8,unit:'repeticiones de 15–20 m',note:'Al 90–95%, volviendo caminando + 1 min. Las dos primeras, más suaves.',knee:true,sub:'6×20 m de marcha técnica, rodilla arriba y sin saltar'},
   cajon:{name:'Saltos al cajón',kind:'height',sets:4,reps:3,rest:60,note:'Bajando caminando. Cae suave y estable.',knee:true,sub:'se saltan hoy'},
   frenar:{name:'Caer y frenar',kind:'check',label:'2×5 saltos cortos al frente, cayendo en silencio y sosteniendo 2 s con la rodilla alineada',knee:true,sub:'se salta hoy'},
@@ -425,14 +431,31 @@ const EX = {
 };
 const KNEE_MINI = ['rod_ext','rod_step','rod_trineo','rod_cph','rod_gem'];
 const SESS = {
-  torsoA:{name:'Torso A',time:'~65 min',items:['calent','banca','dom_lastre','remo','curlM','vuelos','rueda','cuello',...KNEE_MINI]},
+  torsoA:{name:'Torso A',time:'~55 min',pre:'Series mezcladas para que no pase de una hora: lo que tiene la misma letra se alterna (A1 con A2, B1 con B2…) y la rodilla se trabaja en las pausas del torso.',
+    items:['calent','banca','rod_step','dom_lastre','rod_gem','remo','rod_cph','curlM','vuelos','rod_ext','rueda','rod_trineo','cuello'],
+    pairs:[
+      {a:'banca',b:'rod_step',note:'El step-down va en las pausas de la banca.'},
+      {a:'dom_lastre',b:'rod_gem',note:'Los gemelos van en las pausas de las dominadas.'},
+      {a:'remo',b:'rod_cph',note:'La Copenhagen va en las pausas del remo.'},
+      {a:'curlM',b:'vuelos',sup:true,rest:45,note:'Superserie: curl y enseguida vuelos, sin pausa entre ellos. Descansa 45 s al terminar los dos.'},
+      {a:'rod_ext',b:'rueda',sup:true,rest:45,note:'Superserie: extensión con cada pierna y enseguida la rueda. Descansa 45 s al terminar.'},
+      {a:'rod_trineo',b:'cuello',note:'El cuello va en las pausas del trineo.'},
+    ]},
   velocidad:{name:'Velocidad y saltos',slot:'AM',time:'~45 min',pre:'Al aire libre y sin implementos: basta un pasto o una cancha plana. 15 min de calentamiento y técnica de carrera (skipping, talones, progresivos) antes de las aceleraciones.',items:['calentOut','acel','saltoAdel','frenar','saltoLat']},
   carrera:{name:'Carrera y saltos',time:'~60 min',pre:'Al aire libre y sin implementos, en pasto o cancha plana. 15 min de calentamiento y técnica de carrera (skipping, talones, progresivos) antes de las aceleraciones, y 5 min de trote suave al final.',items:['amDom','amFon','amAbs','amHS','calentOut','acel','saltoAdel','frenar','frenado','interm']},
-  piernaA:{name:'Pierna A',time:'~65 min',pre:'Pausa de 2–3 min en los dos primeros ejercicios y de 90 s en el resto.',items:['calent','pc','box','bulg','nordic','colgado']},
+  piernaA:{name:'Pierna A',time:'~60 min',pre:'Pausa de 2–3 min en los dos primeros ejercicios y de 90 s en el resto.',items:['calent','pc','box','bulg','nordic','colgado']},
   aerobico:{name:'Aeróbico suave',time:'~45 min',items:['bici']},
   intermitente:{name:'Frenado e intermitente',slot:'AM',time:'~40 min',pre:'Al aire libre y sin implementos, en pasto o tierra. 5 min de trote suave antes y 5 min al final.',items:['calentOut','frenado','interm']},
-  bisagra:{name:'Pierna B',time:'~65 min',items:['calent','snatch','pp','rdl','hip','granjero']},
-  torsoB:{name:'Torso B',time:'~65 min',items:['calent','militar','supinas','fondos','curl','pallof','cuello',...KNEE_MINI]},
+  bisagra:{name:'Pierna B',time:'~60 min',items:['calent','snatch','pp','rdl','hip','granjero']},
+  torsoB:{name:'Torso B',time:'~55 min',pre:'Series mezcladas para que no pase de una hora: lo que tiene la misma letra se alterna (A1 con A2, B1 con B2…) y la rodilla se trabaja en las pausas del torso.',
+    items:['calent','militar','rod_step','supinas','rod_cph','fondos','rod_gem','curl','pallof','rod_ext','cuello','rod_trineo'],
+    pairs:[
+      {a:'militar',b:'rod_step',note:'El step-down va en las pausas del militar.'},
+      {a:'supinas',b:'rod_cph',note:'La Copenhagen va en las pausas de las dominadas.'},
+      {a:'fondos',b:'rod_gem',note:'Los gemelos van en las pausas de los fondos.'},
+      {a:'curl',b:'pallof',sup:true,rest:45,note:'Superserie: curl y enseguida Pallof, sin pausa entre ellos. Descansa 45 s al terminar los dos.'},
+      {a:'rod_ext',b:'cuello',note:'El cuello va entre las series de extensión.'},
+    ]},
   fondo:{name:'Fondo largo',time:'',items:['fondo']},
   libre:{name:'Descanso',time:'',items:[]},
   rm:{name:'Día de RM',time:'~90 min',pre:'Sentadilla → banca → peso muerto, con 5–8 min entre intentos pesados. Subida 5 → 3 → 2 → 1 → 1: el último single con 1 repetición en reserva y sin intentos fallidos. Si en el calentamiento la rodilla pasa de 2/10, hoy solo banca.',items:['calent','rmSq','rmBp','rmDl']},
@@ -445,18 +468,27 @@ const SESS = {
   transA:{name:'Transición: cuerpo completo',time:'~50 min',pre:'Puente hacia el ciclo enero–febrero: todo liviano, para mover el cuerpo sin cansarlo.',items:['calent','transFB','transCore']},
   transB:{name:'Transición: trote y movilidad',time:'~50 min',pre:'Puente hacia el ciclo enero–febrero: aeróbico suave y movilidad.',items:['calentOut','transRun','transMob']},
 };
+const ABC = 'ABCDEFGH';
+const pairsOf = sk => (SESS[sk] && SESS[sk].pairs) || [];
+const pairIdx = (sk, k) => pairsOf(sk).findIndex(p => p.a === k || p.b === k);
+function pairTag(sk, k){ const ps = pairsOf(sk), i = pairIdx(sk, k); return i < 0 ? '' : ABC[i] + (ps[i].a === k ? 1 : 2); }
+function restAfter(sk, k, ex){
+  const p = pairsOf(sk)[pairIdx(sk, k)];
+  if (p && p.sup) return p.a === k ? 0 : (p.rest || ex.rest || 60);
+  return ex.rest || 90;
+}
 const DAY_PLAN_OLD = {0:['fondo'],1:['torsoA'],2:['velocidad','piernaA'],3:['aerobico'],4:['intermitente','bisagra'],5:['torsoB'],6:['libre']};
 const PLAN_CHANGE = '2026-11-05'; // desde aquí: una sesión por día
 const DAY_PLAN_NEW = {0:['fondo'],1:['piernaA'],2:['torsoA'],3:['carrera'],4:['torsoB'],5:['bisagra'],6:['libre']};
-const DAY_OVERRIDE = {'2026-11-20':['libre'], '2026-11-21':['bisagra'], '2026-12-27':['test5k'], '2026-12-28':['testsDia'], '2026-12-29':['cierre'], '2026-12-30':['rm'], '2026-12-31':['transB'], '2027-01-01':['libre']};
+const DAY_OVERRIDE = {'2026-12-27':['test5k'], '2026-12-28':['testsDia'], '2026-12-29':['cierre'], '2026-12-30':['rm'], '2026-12-31':['transB'], '2027-01-01':['libre']};
 const TRANS_END = '2027-01-01';
 const YEAR_START = '2027-01-01';
 const yearDay = s => s >= YEAR_START ? daysBetween(YEAR_START, s) + 1 : 0;
 const YEAR_DAYS = 365;
 const TEST_NOTE = {'2026-12-27':'5 km contra reloj en vez del fondo. Anota el tiempo en Progreso → Tests.', '2026-12-28':'día de tests. Anota cada resultado en Progreso → Tests.', '2026-12-30':'anota el mejor single de cada ejercicio en Progreso → Tests.'};
 const dayPlan = date => DAY_OVERRIDE[date] || (date < PLAN_CHANGE ? DAY_PLAN_OLD : DAY_PLAN_NEW)[parse(date).getDay()];
-const INTERM = {1:'2×6 min',2:'2×7 min',3:'2×8 min',4:'3×6 min',5:'3×7 min',6:'3×8 min'};
-const FONDO = {1:8,2:9,3:10,4:10,5:11,6:12};
+const INTERM = {1:'2×7 min',2:'2×8 min',3:'3×6 min',4:'3×7 min',5:'3×8 min'};
+const FONDO = {1:8,2:9,3:10,4:11,5:5}; // semana 5: el domingo 27 es el test de 5 km
 const CTYPES = [
   {k:'fondo',name:'Fondo largo',run:true},
   {k:'suave',name:'Trote suave',run:true},
@@ -508,6 +540,7 @@ const shortDay = s => { const d = parse(s); return `${DOW[d.getDay()]} ${d.getDa
 const shortDate = s => { const d = parse(s); return `${d.getDate()} ${MON[d.getMonth()]}`; };
 const daysBetween = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
 const weekOf = s => Math.min(Math.floor(daysBetween(WEEK0, s) / 7) + 1, dayNum(s) > TOTAL_DAYS ? 99 : BLOCK_WEEKS);
+const isCierre = s => dayNum(s) <= TOTAL_DAYS && Math.floor(daysBetween(WEEK0, s) / 7) + 1 > BLOCK_WEEKS;
 const clampWk = wk => Math.min(Math.max(wk, 1), BLOCK_WEEKS);
 const mondayOf = s => addDays(s, -((parse(s).getDay() + 6) % 7));
 const NF = new Intl.NumberFormat('es-CL', {maximumFractionDigits: 2});
@@ -546,6 +579,15 @@ const Local = {
   clear(){ try { localStorage.removeItem(LS_KEY); } catch (e) {} },
 };
 const DEL = Symbol('delete');
+// Reinicio del 23 nov: se borra una sola vez lo registrado antes (entrenamientos, trotes, tests, check-ins y fotos).
+const PURGE_BEFORE = '2026-11-23', PURGE_KEY = 'bitacora-borrado-antes-2026-11-23';
+const purgeDone = (() => { try { return localStorage.getItem(PURGE_KEY) === '1'; } catch (e) { return true; } })();
+function purgeLocal(){
+  if (purgeDone) return;
+  const o = Local.read();
+  ['sessions','checkins','cardio','tests'].forEach(col => { const m = o[col]; if (!m) return; Object.keys(m).forEach(id => { const d = (m[id] && m[id].date) || String(id).slice(0, 10); if (d < PURGE_BEFORE) delete m[id]; }); });
+  Local.write(o);
+}
 const queues = new Map();
 const timers = new Map();
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -781,21 +823,21 @@ function render(){
 function weekText(wk){ return wk < 1 ? 'Días base' : wk <= BLOCK_WEEKS ? `Semana ${wk} de ${BLOCK_WEEKS}${isDeload(wk) ? ' · descarga' : ''}` : 'Reto terminado'; }
 function renderHeader(){
   const wk = weekOf(S.date);
-  { const n = dayNum(S.date), y = yearDay(S.date); $('#weekChip').textContent = y ? `Día ${y} de ${YEAR_DAYS} · faltan ${Math.max(0, YEAR_DAYS - y)}` : n < 1 ? 'El reto parte el lun 16 nov' : n <= TOTAL_DAYS ? `Día ${n} de ${TOTAL_DAYS} · faltan ${TOTAL_DAYS - n}` : S.date <= TRANS_END ? 'Transición al ciclo ene–feb' : 'Reto terminado'; }
+  { const n = dayNum(S.date), y = yearDay(S.date); $('#weekChip').textContent = y ? `Día ${y} de ${YEAR_DAYS} · faltan ${Math.max(0, YEAR_DAYS - y)}` : n < 1 ? `El reto parte el ${DOW[parse(START).getDay()]} ${shortDate(START)}` : n <= TOTAL_DAYS ? `Día ${n} de ${TOTAL_DAYS} · faltan ${TOTAL_DAYS - n}` : S.date <= TRANS_END ? 'Transición al ciclo ene–feb' : 'Reto terminado'; }
 }
 function renderBanner(){
   let h = '';
   if (S.mode === 'local') h = '';
   else if (S.mode === 'readonly') h = '<div class="banner"><b>Solo lectura.</b> Puedes ver los registros, pero no editarlos.</div>';
   else if (S.stale) h = '<div class="banner"><b>Todavía no conecto con la nube.</b> Lo que ves puede estar desactualizado; tus cambios se guardan apenas vuelva la conexión.</div>';
-  else if (weekOf(S.date) > BLOCK_WEEKS && S.view === 'hoy') h = '<div class="banner"><b>Terminaste los 46 días.</b> ' + (S.date <= TRANS_END ? 'Hasta el 1 de enero son días de transición, livianos, para llegar fresco al ciclo enero–febrero.' : 'Pídele a Claude el ciclo enero–febrero; mientras tanto, las sesiones siguen con la misma estructura.') + '</div>';
+  else if (weekOf(S.date) > BLOCK_WEEKS && S.view === 'hoy') h = `<div class="banner"><b>Terminaste los ${TOTAL_DAYS} días.</b> ` + (S.date <= TRANS_END ? 'Hasta el 1 de enero son días de transición, livianos, para llegar fresco al ciclo enero–febrero.' : 'Pídele a Claude el ciclo enero–febrero; mientras tanto, las sesiones siguen con la misma estructura.') + '</div>';
   $('#banner').innerHTML = h;
 }
 function dateNav(){
   const isToday = S.date === todayISO();
   return `<div class="datenav">
     <button class="btn icon" type="button" data-act="day" data-d="-1" aria-label="Día anterior"${S.date <= START ? ' disabled' : ''}>${ICON.left}</button>
-    <label class="datebtn"><b>${esc(dayLabel(S.date))}</b><small>${isToday ? 'Hoy · ' : ''}${yearDay(S.date) ? `Día ${yearDay(S.date)} de ${YEAR_DAYS}` : `${dayNum(S.date) <= TOTAL_DAYS ? `Día ${dayNum(S.date)} · ` : ''}${esc(weekText(weekOf(S.date)))}`}</small><input type="date" id="datePick" value="${S.date}" min="${START}" aria-label="Elegir fecha"></label>
+    <label class="datebtn"><b>${esc(dayLabel(S.date))}</b><small>${isToday ? 'Hoy · ' : ''}${yearDay(S.date) ? `Día ${yearDay(S.date)} de ${YEAR_DAYS}` : `${dayNum(S.date) <= TOTAL_DAYS ? `Día ${dayNum(S.date)} · ` : ''}${esc(isCierre(S.date) ? 'Cierre: tests y RM' : weekText(weekOf(S.date)))}`}</small><input type="date" id="datePick" value="${S.date}" min="${START}" aria-label="Elegir fecha"></label>
     <button class="btn icon" type="button" data-act="day" data-d="1" aria-label="Día siguiente">${ICON.right}</button>
   </div>`;
 }
@@ -820,9 +862,9 @@ function viewHoy(){
   if (L === 'amarillo' || L === 'rojo') h += `<div class="banner" data-l="${L}"><b>${LIGHT[L].word}:</b> ${LIGHT[L].todo}</div>`;
   if (TEST_NOTE[date]) h += `<div class="banner"><b>Test hoy:</b> ${TEST_NOTE[date]}</div>`;
   h += bodyCardHTML(date);
-  h += fotoCardHTML(date);
   if (keys.length > 1) h += `<div class="seg slots" role="tablist" aria-label="Sesión del día">${keys.map((k, i) => `<button type="button" role="tab" aria-selected="${i === S.sessIdx}" data-act="slot" data-i="${i}"><b>${SESS[k].slot}</b>${esc(SESS[k].name)}</button>`).join('')}</div>`;
   h += sessionHTML(date, sk, L);
+  h += fotoCardHTML(date);
   return h;
 }
 function sessionHTML(date, sk, L){
@@ -836,11 +878,14 @@ function sessionHTML(date, sk, L){
   if (L === 'rojo' && kneeSess) h += '<div class="sess-warn">Rodilla en rojo: salta lo marcado y haz solo torso, bici suave o caminata.</div>';
   if (t.pre) h += `<p class="sess-pre">${esc(t.pre)}</p>`;
   let group = null;
+  const ps = pairsOf(sk);
   t.items.forEach(k => {
-    const ex = EX[k];
-    if (ex.group && ex.group !== group) h += `<div class="group"><span class="label">${esc(ex.group)}</span><span class="muted">~15–20 min</span></div>`;
-    group = ex.group || null;
-    h += exHTML(k, items[k] || defaultItem(k, date), date, L);
+    const ex = EX[k], i = pairIdx(sk, k), p = ps[i];
+    if (p && p.a === k) h += `<div class="pair"><div class="pair-head"><span class="label">Serie mezclada ${ABC[i]}</span><span>${esc(p.note)}</span></div>`;
+    if (!ps.length && ex.group && ex.group !== group) h += `<div class="group"><span class="label">${esc(ex.group)}</span><span class="muted">~15–20 min</span></div>`;
+    group = p ? null : (ex.group || null);
+    h += exHTML(k, items[k] || defaultItem(k, date), date, L, sk);
+    if (p && p.b === k) h += '</div>';
   });
   h += sessFoot(s);
   return h + '</div>';
@@ -855,8 +900,8 @@ function exBadge(k, it, date){
   if (ex.kind === 'count') { const tg = countTarget(ex, clampWk(weekOf(date))); return `<span class="prog${(it.count || 0) >= tg ? ' full' : ''}">${it.count || 0}/${tg}</span>`; }
   return exDone(k, it, date) ? '<span class="prog full">Hecho</span>' : '';
 }
-function exHTML(k, it, date, L){
-  const ex = EX[k]; const wk = weekOf(date);
+function exHTML(k, it, date, L, sk){
+  const ex = EX[k]; const wk = weekOf(date); const tg = sk ? pairTag(sk, k) : '';
   const skip = L === 'rojo' && ex.knee;
   let body = '';
   if (it.sets) body = setsHTML(k, it, ex) + (ex.rir != null ? rirHTML(k, it) : '') + hintHTML(k, date);
@@ -865,7 +910,7 @@ function exHTML(k, it, date, L){
   else if (ex.kind === 'check') body = checkBtn('check', it.done);
   else if (ex.kind === 'cardio') body = cardioItemHTML(k, date);
   const sub = (L === 'amarillo' || L === 'rojo') && ex.sub ? `<p class="subnote" data-l="${L}">En ${LIGHT[L].word.toLowerCase()}: ${esc(ex.sub)}.</p>` : '';
-  return `<article class="ex${skip ? ' skip' : ''}" id="ex-${k}" data-k="${k}"><div class="ex-head"><div class="ex-title"><h3>${esc(ex.name)}</h3><p class="presc${ex.kind === 'check' ? ' txt' : ''}">${esc(prescription(k, wk))}</p></div>${exBadge(k, it, date)}</div>${ex.note ? `<p class="note">${esc(ex.note)}</p>` : ''}${sub}${body}</article>`;
+  return `<article class="ex${skip ? ' skip' : ''}" id="ex-${k}" data-k="${k}"><div class="ex-head"><div class="ex-title"><h3>${tg ? `<span class="tag">${tg}</span>` : ''}${esc(ex.name)}</h3><p class="presc${ex.kind === 'check' ? ' txt' : ''}">${esc(prescription(k, wk))}</p></div>${exBadge(k, it, date)}</div>${ex.note ? `<p class="note">${esc(ex.note)}</p>` : ''}${sub}${body}</article>`;
 }
 const checkBtn = (act, on) => `<button class="btn checkbtn" type="button" data-act="${act}" aria-pressed="${!!on}">${ICON.check}<span>${on ? 'Hecho' : 'Marcar hecho'}</span></button>`;
 function setsHTML(k, it, ex){
@@ -1282,7 +1327,7 @@ function exContext(el){
 }
 function refreshEx(c, focusSel){
   const el = document.getElementById('ex-' + c.k);
-  if (el) el.outerHTML = exHTML(c.k, c.it, S.date, lightFor(S.date));
+  if (el) el.outerHTML = exHTML(c.k, c.it, S.date, lightFor(S.date), c.sk);
   const sp = document.getElementById('sp-' + c.sk);
   if (sp) sp.innerHTML = sessProgress(c.d, c.sk, S.date);
   if (focusSel) { const f = app.querySelector(focusSel); if (f) f.focus({preventScroll:true}); }
@@ -1303,7 +1348,7 @@ function onClick(e){
   switch (act) {
     case 'day': changeDate(addDays(S.date, Number(b.dataset.d))); break;
     case 'slot': flushAll(); S.sessIdx = Number(b.dataset.i); render(); break;
-    case 'tick': { const c = exContext(b); if (!c || c.i < 0) return; const st = c.it.sets[c.i]; st.done = !st.done; if (st.done) startRest(c.ex.rest || 90); markDirty(sessionId(S.date, c.sk)); refreshEx(c, `#ex-${c.k} .set[data-i="${c.i}"] [data-act="tick"]`); break; }
+    case 'tick': { const c = exContext(b); if (!c || c.i < 0) return; const st = c.it.sets[c.i]; st.done = !st.done; if (st.done) { const r = restAfter(c.sk, c.k, c.ex); if (r) startRest(r); else stopRest(); } markDirty(sessionId(S.date, c.sk)); refreshEx(c, `#ex-${c.k} .set[data-i="${c.i}"] [data-act="tick"]`); break; }
     case 'addset': { const c = exContext(b); if (!c) return; const last = c.it.sets[c.it.sets.length - 1] || {}; c.it.sets.push(Object.assign({}, last, {done:false})); markDirty(sessionId(S.date, c.sk)); refreshEx(c, `#ex-${c.k} [data-act="addset"]`); break; }
     case 'delset': { const c = exContext(b); if (!c || c.it.sets.length < 2) return; c.it.sets.pop(); markDirty(sessionId(S.date, c.sk)); refreshEx(c, `#ex-${c.k} [data-act="addset"]`); break; }
     case 'rir': { const c = exContext(b); if (!c) return; const v = Number(b.dataset.v); c.it.rir = c.it.rir === v ? null : v; markDirty(sessionId(S.date, c.sk)); refreshEx(c, `#ex-${c.k} [data-act="rir"][data-v="${v}"]`); break; }
@@ -1329,7 +1374,7 @@ function onClick(e){
     case 'copysum': copySummary(); break;
     case 'fotodel': delFoto(S.date); break;
     case 'fotoprev': restoreFoto(S.date); break;
-    case 'gofoto': changeDate(b.dataset.d); location.hash = '#hoy'; break;
+    case 'gofoto': changeDate(b.dataset.d); S.focusFoto = true; location.hash = '#hoy'; break;
     case 'export': exportBackup(); break;
     case 'more': S.histLimit += 60; render(); break;
     case 'open': openEntry(b.dataset.col, b.dataset.id); break;
@@ -1434,6 +1479,7 @@ function onChange(e){
 /* ---------------- Descanso, avisos, tooltip ---------------- */
 let restEnd = 0, restTimer = 0;
 function startRest(sec){ restEnd = Date.now() + sec * 1000; const r = $('#rest'); r.hidden = false; r.dataset.done = '0'; clearInterval(restTimer); restTimer = setInterval(tickRest, 500); tickRest(); }
+function stopRest(){ clearInterval(restTimer); const r = $('#rest'); if (r) r.hidden = true; }
 function tickRest(){
   const left = Math.max(0, Math.round((restEnd - Date.now()) / 1000)); const r = $('#rest');
   $('#restTime').textContent = left > 0 ? `${Math.floor(left / 60)}:${pad(left % 60)}` : '¡Vamos!';
@@ -1467,6 +1513,7 @@ window.addEventListener('hashchange', () => {
   if (document.activeElement && app.contains(document.activeElement)) document.activeElement.blur();
   render(); window.scrollTo(0, 0);
   if (S.view === 'trote' && S.focusCardio) { S.focusCardio = false; const f = $('#cform'); if (f) f.scrollIntoView({block:'start'}); }
+  if (S.view === 'hoy' && S.focusFoto) { S.focusFoto = false; const f = $('#fotoCard'); if (f) f.scrollIntoView({block:'start'}); }
   if (S.view === 'progreso' && S.focusBody) { S.focusBody = false; const f = $('#pesoCard'); if (f) f.scrollIntoView({block:'start'}); }
 });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushAll(); });
@@ -1506,6 +1553,7 @@ function subscribe(col){
   });
 }
 async function init(){
+  purgeLocal();
   S.date = defaultDate(); S.sessIdx = defaultSlot(S.date); S.view = viewFromHash();
   render();
   const cl = window.claude;
@@ -1565,6 +1613,7 @@ const Fotos = (() => {
 })();
 S.thumbs = new Map(); S.fullFoto = new Map(); S.prev = new Set(); S.fotosReady = false;
 async function loadThumbs(){
+  if (!purgeDone) { try { for (const k of await Fotos.keys()) { if (String(k).replace(/^prev:/, '') < PURGE_BEFORE) await Fotos.del(k); } } catch (e) {} try { localStorage.setItem(PURGE_KEY, '1'); } catch (e) {} }
   try { const ks = await Fotos.keys(); for (const k of ks) { if (String(k).startsWith('prev:')) { S.prev.add(String(k).slice(5)); continue; } const v = await Fotos.get(k); if (v && v.thumb) S.thumbs.set(k, v.thumb); } } catch (e) {}
   S.fotosReady = true; scheduleRender();
 }
