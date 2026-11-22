@@ -410,8 +410,8 @@ const EX = {
   rmSq:{name:'Sentadilla: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,knee:true,note:'A paralelo como mucho y con barras de seguridad.',sub:'hoy no: solo banca'},
   rmBp:{name:'Banca: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,note:'Con alguien que te asista.'},
   rmDl:{name:'Peso muerto: RM técnico',kind:'load',sets:5,reps:1,repsLabel:'5 → 3 → 2 → 1 → 1',rest:300,fixed:true,knee:true,note:'Con barra hexagonal si hay; si no, convencional.',sub:'hoy no: solo banca'},
-  amDom:{name:'AM · Dominadas',kind:'reps',sets:10,reps:5,rest:60,note:'Deja 2–3 repeticiones en reserva en cada serie. Ajusta series y repeticiones como te acomode.'},
-  amFon:{name:'AM · Fondos',kind:'reps',sets:10,reps:10,rest:60,note:'Deja 2–3 repeticiones en reserva en cada serie.'},
+  amDom:{name:'AM · Dominadas',kind:'reps',sets:5,reps:10,rest:60,note:'Deja 2–3 repeticiones en reserva en cada serie. Ajusta series y repeticiones como te acomode.'},
+  amFon:{name:'AM · Fondos',kind:'reps',sets:5,reps:10,rest:60,note:'Deja 2–3 repeticiones en reserva en cada serie.'},
   amAbs:{name:'AM · Rutina de abs',kind:'check',label:'~10 min.'},
   amHS:{name:'AM · Parada de manos',kind:'reps',sets:3,reps:30,repsLabel:'máx. segundos',repsUnit:'s',rest:120,note:'Anota los segundos de cada intento.'},
   saltoT:{name:'Test: salto largo a pies juntos',kind:'check',label:'El mejor de 3 intentos, cayendo estable.'},
@@ -430,7 +430,7 @@ const EX = {
 };
 const KNEE_MINI = ['rod_ext','rod_step','rod_trineo','rod_cph','rod_gem'];
 const SESS = {
-  torsoA:{name:'Torso A',time:'~55 min',pre:'Series mezcladas para que no pase de una hora: lo que tiene la misma letra se alterna (A1 con A2, B1 con B2…) y la rodilla se trabaja en las pausas del torso.',
+  torsoA:{name:'Torso A',time:'~60 min',pre:'Series mezcladas para que no pase de una hora: lo que tiene la misma letra se alterna (A1 con A2, B1 con B2…) y la rodilla se trabaja en las pausas del torso.',
     items:['calent','banca','rod_step','dom_lastre','rod_gem','remo','rod_cph','curlM','vuelos','rod_ext','rueda','cuello','rod_trineo'],
     pairs:[
       {a:'banca',b:'rod_step',note:'El step-down va en las pausas de la banca.'},
@@ -445,7 +445,7 @@ const SESS = {
   aerobico:{name:'Aeróbico suave',time:'~45 min',items:['bici']},
   intermitente:{name:'Frenado e intermitente',slot:'AM',time:'~40 min',pre:'Al aire libre y sin implementos, en pasto o tierra. 5 min de trote suave antes y 5 min al final.',items:['calentOut','frenado','interm']},
   bisagra:{name:'Pierna B',time:'~60 min',items:['calent','snatch','pp','rdl','hip','granjero']},
-  torsoB:{name:'Torso B',time:'~55 min',pre:'Series mezcladas para que no pase de una hora: lo que tiene la misma letra se alterna (A1 con A2, B1 con B2…) y la rodilla se trabaja en las pausas del torso.',
+  torsoB:{name:'Torso B',time:'~60 min',pre:'Series mezcladas para que no pase de una hora: lo que tiene la misma letra se alterna (A1 con A2, B1 con B2…) y la rodilla se trabaja en las pausas del torso.',
     items:['calent','militar','rod_step','supinas','rod_cph','fondos','rod_gem','curl','pallof','rod_ext','cuello','rod_trineo'],
     pairs:[
       {a:'militar',b:'rod_step',note:'El step-down va en las pausas del militar.'},
