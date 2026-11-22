@@ -183,11 +183,10 @@ textarea{padding:10px 12px;resize:vertical}
 .group{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 16px;background:var(--sunk);border-bottom:1px solid var(--line);font-size:13px}
 .ex{display:flex;flex-direction:column;gap:10px;padding:14px 16px 16px;border-bottom:1px solid var(--line)}
 .ex.skip{opacity:.55}
-.pair{border-left:4px solid var(--accent);border-bottom:1px solid var(--line)}
+.pair{border-bottom:1px solid var(--line)}
 .pair .ex:last-child{border-bottom:0}
-.pair-head{display:flex;flex-direction:column;gap:2px;padding:10px 16px 10px 12px;background:var(--accent-soft);border-bottom:1px solid var(--line);font-size:13.5px;line-height:1.35}
+.pair-head{display:flex;flex-direction:column;gap:2px;padding:10px 16px;background:var(--accent-soft);border-bottom:1px solid var(--line);font-size:13.5px;line-height:1.35}
 .pair-head .label{color:var(--accent)}
-.pair .ex{padding-left:12px}
 .tag{display:inline-block;min-width:26px;margin-right:7px;padding:1px 6px;border-radius:6px;background:var(--accent);color:var(--accent-ink);font-size:12.5px;font-weight:800;text-align:center;vertical-align:2px}
 .ex-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .ex-title{min-width:0}
@@ -380,7 +379,7 @@ const EX = {
   cuello:{name:'Cuello isométrico',kind:'check',label:'4 direcciones · 2×15 s cada una, empujando al 50%'},
   rod_ext:{name:'Extensión de rodilla a una pierna',kind:'leftright',sets:3,reps:10,repsLabel:'10–12',rest:60,group:GROUP_KNEE,note:'Rango cómodo, bajando en 3 s. Anota la serie más pesada de cada pierna.'},
   rod_step:{name:'Step-down lateral',kind:'check',label:'3×8 por lado desde cajón de 15–20 cm, bajando en 3 s',group:GROUP_KNEE},
-  rod_trineo:{name:'Trineo hacia atrás',kind:'check',label:'4×20 m (sin trineo: cinta hacia atrás 4×1 min)',group:GROUP_KNEE},
+  rod_trineo:{name:'Caminata hacia atrás en cinta',kind:'check',label:'4 min seguidos, con inclinación suave',group:GROUP_KNEE},
   rod_cph:{name:'Plancha Copenhagen',kind:'check',label:'2×20 s por lado',group:GROUP_KNEE},
   rod_gem:{name:'Gemelos, pierna recta y flexionada',kind:'check',label:'4 series de 12–15: 2 con la pierna recta y 2 flexionada',group:GROUP_KNEE},
   acel:{name:'Aceleraciones en plano',kind:'count',target:6,target3:8,unit:'repeticiones de 15–20 m',note:'Al 90–95%, volviendo caminando + 1 min. Las dos primeras, más suaves.',knee:true,sub:'6×20 m de marcha técnica, rodilla arriba y sin saltar'},
@@ -432,14 +431,13 @@ const EX = {
 const KNEE_MINI = ['rod_ext','rod_step','rod_trineo','rod_cph','rod_gem'];
 const SESS = {
   torsoA:{name:'Torso A',time:'~55 min',pre:'Series mezcladas para que no pase de una hora: lo que tiene la misma letra se alterna (A1 con A2, B1 con B2…) y la rodilla se trabaja en las pausas del torso.',
-    items:['calent','banca','rod_step','dom_lastre','rod_gem','remo','rod_cph','curlM','vuelos','rod_ext','rueda','rod_trineo','cuello'],
+    items:['calent','banca','rod_step','dom_lastre','rod_gem','remo','rod_cph','curlM','vuelos','rod_ext','rueda','cuello','rod_trineo'],
     pairs:[
       {a:'banca',b:'rod_step',note:'El step-down va en las pausas de la banca.'},
       {a:'dom_lastre',b:'rod_gem',note:'Los gemelos van en las pausas de las dominadas.'},
       {a:'remo',b:'rod_cph',note:'La Copenhagen va en las pausas del remo.'},
       {a:'curlM',b:'vuelos',sup:true,rest:45,note:'Superserie: curl y enseguida vuelos, sin pausa entre ellos. Descansa 45 s al terminar los dos.'},
       {a:'rod_ext',b:'rueda',sup:true,rest:45,note:'Superserie: extensión con cada pierna y enseguida la rueda. Descansa 45 s al terminar.'},
-      {a:'rod_trineo',b:'cuello',note:'El cuello va en las pausas del trineo.'},
     ]},
   velocidad:{name:'Velocidad y saltos',slot:'AM',time:'~45 min',pre:'Al aire libre y sin implementos: basta un pasto o una cancha plana. 15 min de calentamiento y técnica de carrera (skipping, talones, progresivos) antes de las aceleraciones.',items:['calentOut','acel','saltoAdel','frenar','saltoLat']},
   carrera:{name:'Carrera y saltos',time:'~60 min',pre:'Al aire libre y sin implementos, en pasto o cancha plana. 15 min de calentamiento y técnica de carrera (skipping, talones, progresivos) antes de las aceleraciones, y 5 min de trote suave al final.',items:['amDom','amFon','amAbs','amHS','calentOut','acel','saltoAdel','frenar','frenado','interm']},
