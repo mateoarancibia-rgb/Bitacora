@@ -358,9 +358,9 @@ body.ro main input,body.ro main textarea{pointer-events:none;opacity:.7}
 'use strict';
 
 /* ---------------- Plan del bloque 1 ---------------- */
-const START = '2026-11-23';           // lunes: día 1 del reto de 39 días (hasta el 31 dic)
+const START = '2026-11-24';           // martes: día 1 del reto de 38 días (hasta el 31 dic)
 const WEEK0 = '2026-11-23';           // lunes de la semana 1 (semanas de lunes a domingo)
-const TOTAL_DAYS = 39;
+const TOTAL_DAYS = 38;
 const dayNum = s => daysBetween(START, s) + 1;
 const BLOCK_WEEKS = 5;
 const DELOAD = [];
@@ -478,7 +478,7 @@ function restAfter(sk, k, ex){
 const DAY_PLAN_OLD = {0:['fondo'],1:['torsoA'],2:['velocidad','piernaA'],3:['aerobico'],4:['intermitente','bisagra'],5:['torsoB'],6:['libre']};
 const PLAN_CHANGE = '2026-11-05'; // desde aquí: una sesión por día
 const DAY_PLAN_NEW = {0:['fondo'],1:['piernaA'],2:['torsoA'],3:['carrera'],4:['torsoB'],5:['bisagra'],6:['libre']};
-const DAY_OVERRIDE = {'2026-12-27':['test5k'], '2026-12-28':['testsDia'], '2026-12-29':['cierre'], '2026-12-30':['rm'], '2026-12-31':['transB'], '2027-01-01':['libre']};
+const DAY_OVERRIDE = {'2026-11-24':['piernaA'], '2026-11-25':['torsoA'], '2026-11-26':['carrera'], '2026-11-27':['torsoB'], '2026-11-28':['bisagra'], '2026-12-27':['test5k'], '2026-12-28':['testsDia'], '2026-12-29':['cierre'], '2026-12-30':['rm'], '2026-12-31':['transB'], '2027-01-01':['libre']};
 const TRANS_END = '2027-01-01';
 const YEAR_START = '2027-01-01';
 const yearDay = s => s >= YEAR_START ? daysBetween(YEAR_START, s) + 1 : 0;
