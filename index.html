@@ -358,11 +358,11 @@ body.ro main input,body.ro main textarea{pointer-events:none;opacity:.7}
 'use strict';
 
 /* ---------------- Plan del bloque 1 ---------------- */
-const START = '2026-11-26';           // jueves: día 1 del reto de 36 días (hasta el 31 dic)
-const WEEK0 = '2026-11-23';           // lunes de la semana 1 (semanas de lunes a domingo)
-const TOTAL_DAYS = 36;
+const START = '2026-11-27';           // viernes: día 1 del reto de 35 días (hasta el 31 dic); esta semana es la semana 0
+const WEEK0 = '2026-11-30';           // lunes de la semana 1 (semanas de lunes a domingo); los días antes son la semana 0
+const TOTAL_DAYS = 35;
 const dayNum = s => daysBetween(START, s) + 1;
-const BLOCK_WEEKS = 5;
+const BLOCK_WEEKS = 4;
 const DELOAD = [];
 const isDeload = wk => DELOAD.includes(wk);
 const BW_DEFAULT = 72;
@@ -491,8 +491,8 @@ const yearDay = s => s >= YEAR_START ? daysBetween(YEAR_START, s) + 1 : 0;
 const YEAR_DAYS = 365;
 const TEST_NOTE = {'2026-12-27':'5 km contra reloj en vez del fondo. Anota el tiempo en Progreso → Tests.', '2026-12-29':'día de tests. Anota cada resultado en Progreso → Tests.', '2026-12-30':'anota el mejor single de cada ejercicio en Progreso → Tests.'};
 const dayPlan = date => DAY_OVERRIDE[date] || (date < PLAN_CHANGE ? DAY_PLAN_OLD : DAY_PLAN_NEW)[parse(date).getDay()];
-const INTERM = {1:'2×7 min',2:'2×8 min',3:'3×6 min',4:'3×7 min',5:'3×8 min'};
-const FONDO = {1:8,2:9,3:10,4:11,5:5}; // semana 5: el domingo 27 es el test de 5 km
+const INTERM = {0:'2×7 min',1:'2×8 min',2:'3×6 min',3:'3×7 min',4:'3×8 min'};
+const FONDO = {0:8,1:9,2:10,3:11,4:5}; // semana 4: el domingo 27 es el test de 5 km
 const CTYPES = [
   {k:'fondo',name:'Fondo largo',run:true},
   {k:'suave',name:'Trote suave',run:true},
@@ -545,7 +545,7 @@ const shortDate = s => { const d = parse(s); return `${d.getDate()} ${MON[d.getM
 const daysBetween = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
 const weekOf = s => Math.min(Math.floor(daysBetween(WEEK0, s) / 7) + 1, dayNum(s) > TOTAL_DAYS ? 99 : BLOCK_WEEKS);
 const isCierre = s => dayNum(s) <= TOTAL_DAYS && Math.floor(daysBetween(WEEK0, s) / 7) + 1 > BLOCK_WEEKS;
-const clampWk = wk => Math.min(Math.max(wk, 1), BLOCK_WEEKS);
+const clampWk = wk => Math.min(Math.max(wk, 0), BLOCK_WEEKS);
 const mondayOf = s => addDays(s, -((parse(s).getDay() + 6) % 7));
 const NF = new Intl.NumberFormat('es-CL', {maximumFractionDigits: 2});
 const fmt = n => (n == null || !isFinite(n)) ? '—' : NF.format(n);
@@ -557,7 +557,7 @@ const avg = a => a.length ? sum(a) / a.length : null;
 const e1rm = (kg, reps) => (kg == null || !reps) ? null : kg * (1 + reps / 30);
 const mmss = sec => { if (sec == null) return '—'; const s = Math.round(sec); return `${Math.floor(s / 60)}:${pad(s % 60)}`; };
 const parseTime = t => { const m = String(t || '').trim().match(/^(\d{1,3})[:.,](\d{1,2})$/); if (m) return Number(m[1]) * 60 + Number(m[2]); const n = num(t); return n == null ? null : n * 60; };
-const countTarget = (ex, wk) => (wk >= 3 && ex.target3) ? ex.target3 : ex.target;
+const countTarget = (ex, wk) => (wk >= 2 && ex.target3) ? ex.target3 : ex.target;
 const setsFor = (ex, wk) => (isDeload(wk) && !ex.fixed) ? Math.max(1, Math.round(ex.sets * 0.6)) : ex.sets;
 const sessionId = (date, sk) => `${date}_${sk}`;
 
@@ -733,7 +733,7 @@ function prescription(k, wk){
   if (ex.kind === 'cardio') {
     if (k === 'fondo') return wk > BLOCK_WEEKS ? 'Distancia según la nueva planificación' : `${fmt(FONDO[w])} km suaves`;
     if (k === 'interm') return wk > BLOCK_WEEKS ? 'Series según la nueva planificación' : `${INTERM[w]} de 15 s / 15 s`;
-    return (w >= 3 && w <= 4) ? '35–40 min · si vienes en verde, 20–25 de ellos en trote suave' : '35–40 min en zona suave';
+    return (w >= 2 && w <= 3) ? '35–40 min · si vienes en verde, 20–25 de ellos en trote suave' : '35–40 min en zona suave';
   }
   if (ex.kind === 'check') return ex.label;
   if (ex.kind === 'count') return `${countTarget(ex, w)} ${ex.unit}`;
@@ -824,7 +824,7 @@ function render(){
   const fn = {hoy:viewHoy, rodilla:viewRodilla, trote:viewTrote, progreso:viewProgreso, historial:viewHistorial}[S.view];
   $('#v-' + S.view).innerHTML = fn();
 }
-function weekText(wk){ return wk < 1 ? 'Días base' : wk <= BLOCK_WEEKS ? `Semana ${wk} de ${BLOCK_WEEKS}${isDeload(wk) ? ' · descarga' : ''}` : 'Reto terminado'; }
+function weekText(wk){ return wk < 1 ? 'Semana 0 · inicio' : wk <= BLOCK_WEEKS ? `Semana ${wk} de ${BLOCK_WEEKS}${isDeload(wk) ? ' · descarga' : ''}` : 'Reto terminado'; }
 function renderHeader(){
   const wk = weekOf(S.date);
   { const n = dayNum(S.date), y = yearDay(S.date); $('#weekChip').textContent = y ? `Día ${y} de ${YEAR_DAYS} · faltan ${Math.max(0, YEAR_DAYS - y)}` : n < 1 ? `El reto parte el ${DOW[parse(START).getDay()]} ${shortDate(START)}` : n <= TOTAL_DAYS ? `Día ${n} de ${TOTAL_DAYS} · faltan ${TOTAL_DAYS - n}` : S.date <= TRANS_END ? 'Transición al ciclo ene–feb' : 'Reto terminado'; }
@@ -1026,7 +1026,7 @@ function viewTrote(){
   const runs = list.filter(([, c]) => CT[c.type] && CT[c.type].run);
   const km = sum(runs.map(([, c]) => c.km));
   const fondoKm = Math.max(0, ...list.filter(([, c]) => c.type === 'fondo').map(([, c]) => c.km || 0));
-  const plan = wk >= 1 && wk <= BLOCK_WEEKS ? FONDO[wk] : null;
+  const plan = wk >= 0 && wk <= BLOCK_WEEKS ? FONDO[wk] : null;
   const other = sum(list.filter(([, c]) => !(CT[c.type] && CT[c.type].run)).map(([, c]) => c.min));
   if (!S.cd) S.cd = {date:S.date, type:'suave', km:null, min:null, rpe:null, knee:null, note:''};
   let h = `<div class="weeknav"><button class="btn icon" type="button" data-act="day" data-d="-7" aria-label="Semana anterior"${mon <= START ? ' disabled' : ''}>${ICON.left}</button><div><b>${esc(shortDate(mon))} – ${esc(shortDate(sun))}</b><span class="muted sm">${esc(weekText(wk))}</span></div><button class="btn icon" type="button" data-act="day" data-d="7" aria-label="Semana siguiente">${ICON.right}</button></div>`;
@@ -1057,7 +1057,7 @@ function weeklyKmHTML(){
   const rows = mons.slice(-10).map(m => {
     const e = addDays(m, 6); const cs = [...S.cardio.values()].filter(c => c.date >= m && c.date <= e);
     const wk = weekOf(addDays(m, 6));
-    return {m, km: Math.round(sum(cs.filter(c => CT[c.type] && CT[c.type].run).map(c => c.km)) * 10) / 10, fondo: Math.max(0, ...cs.filter(c => c.type === 'fondo').map(c => c.km || 0)), plan: wk >= 1 && wk <= BLOCK_WEEKS ? FONDO[wk] : null};
+    return {m, km: Math.round(sum(cs.filter(c => CT[c.type] && CT[c.type].run).map(c => c.km)) * 10) / 10, fondo: Math.max(0, ...cs.filter(c => c.type === 'fondo').map(c => c.km || 0)), plan: wk >= 0 && wk <= BLOCK_WEEKS ? FONDO[wk] : null};
   });
   let h = '<div class="card pad stack"><h2 class="h">Kilómetros por semana</h2>';
   if (!rows.some(r => r.km || r.fondo)) return h + '<div class="empty"><b>Aún sin kilómetros.</b><p>Cuando registres trotes, aquí ves el total de cada semana y tu fondo largo contra lo planificado.</p></div></div>';
@@ -1180,7 +1180,7 @@ function weekSummary(date){
   const mon = mondayOf(date), sun = addDays(mon, 6), wk = weekOf(sun);
   const days = Array.from({length:7}, (_, i) => addDays(mon, i));
   const L = [];
-  L.push(`Bitácora · ${wk >= 1 ? `semana ${wk}${wk <= BLOCK_WEEKS ? ` de ${BLOCK_WEEKS}` : ''}` : 'antes del bloque'} (${shortDate(mon)} – ${shortDate(sun)})`, '');
+  L.push(`Bitácora · ${wk >= 0 ? `semana ${wk}${wk <= BLOCK_WEEKS ? ` de ${BLOCK_WEEKS}` : ''}` : 'antes del bloque'} (${shortDate(mon)} – ${shortDate(sun)})`, '');
   L.push('Rodilla al despertar: ' + days.map(d => { const c = S.checkins.get(d); return `${DOW[parse(d).getDay()]} ${c && c.pain != null ? `${c.pain}/10 ${LIGHT[lightOf(c)].word.toLowerCase()}` : '—'}`; }).join(' · '));
   const sl = days.map(sleepOf).filter(v => v != null);
   const qs = days.map(d => { const b = bodyRec(d); return b && b.quality; }).filter(Boolean);
@@ -1200,7 +1200,7 @@ function weekSummary(date){
   if (kd.length) L.push('', 'Rodilla durante las sesiones: ' + kd.join(' · '));
   const cs = [...S.cardio.values()].filter(c => c.date >= mon && c.date <= sun).sort((a, b) => a.date.localeCompare(b.date));
   const run = cs.filter(c => CT[c.type] && CT[c.type].run);
-  L.push('', `Trote: ${fmt(Math.round(sum(run.map(c => c.km)) * 10) / 10)} km en ${run.length} ${run.length === 1 ? 'salida' : 'salidas'}${wk >= 1 && wk <= BLOCK_WEEKS ? ` · fondo planificado ${FONDO[wk]} km` : ''}`);
+  L.push('', `Trote: ${fmt(Math.round(sum(run.map(c => c.km)) * 10) / 10)} km en ${run.length} ${run.length === 1 ? 'salida' : 'salidas'}${wk >= 0 && wk <= BLOCK_WEEKS ? ` · fondo planificado ${FONDO[wk]} km` : ''}`);
   cs.forEach(c => L.push(`- ${DOW[parse(c.date).getDay()]}: ${cardioLine(c)}`));
   const notes = ss.filter(s => s.note).map(s => `- ${(SESS[s.key] && SESS[s.key].name) || s.name}: ${s.note}`)
     .concat(days.map(d => S.checkins.get(d)).filter(c => c && c.note).map(c => `- Rodilla ${shortDay(c.date)}: ${c.note}`))
