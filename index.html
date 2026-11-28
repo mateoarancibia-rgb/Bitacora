@@ -98,6 +98,7 @@ nav.tabs svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1
 .btn:disabled{opacity:.45;cursor:default}
 .btn:focus-visible,.seg button:focus-visible,.pain button:focus-visible,.tick:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,nav.tabs a:focus-visible,.hit:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 input.num,input.text,textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--sunk);color:var(--ink);font:500 16px/1.3 var(--font-body)}
+input.num.time{min-width:0;-webkit-appearance:none;appearance:none}
 input.num{height:46px;text-align:center;font-weight:700;font-size:18px;font-variant-numeric:tabular-nums;padding:0 4px}
 input.text{height:46px;padding:0 10px}
 textarea{padding:10px 12px;resize:vertical}
@@ -250,6 +251,7 @@ textarea{padding:10px 12px;resize:vertical}
 .legend .sw.dotk{width:10px;height:10px;border-radius:50%;background:var(--ink)}
 .legend .sw.plan{width:14px;height:0;border-top:2px dashed var(--muted);border-radius:0;background:none}
 .legend .sw.short{background:var(--warn-dot)}
+.legend .sw.nap{background:var(--muted);opacity:.55}
 .legend .sw.dotm{width:10px;height:10px;border-radius:50%;background:var(--muted)}
 .legend .sw.line{height:0;border-top:2px solid var(--accent);border-radius:0;background:none}
 .test{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
@@ -290,6 +292,7 @@ textarea{padding:10px 12px;resize:vertical}
 .chart .trend{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
 .chart .pt.raw{fill:var(--muted)}
 .chart .bar.short{fill:var(--warn-dot)}
+.chart .bar.nap{fill:var(--muted);opacity:.55}
 .chart .hit{fill:transparent;cursor:pointer}
 .chart .hit:focus{outline:none}
 .dt summary{font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;min-height:28px;display:flex;align-items:center}
@@ -778,6 +781,12 @@ function pace(km, min){ if (!km || !min) return ''; const sec = min * 60 / km; r
 /* Peso y sueño: un registro por mañana en la colección body (id = fecha) */
 const QUAL = {mal:'Mal', regular:'Regular', bien:'Bien'};
 const SLEEP_GOAL = 6, SLEEP_LOW = 6;
+const toMin = t => { const m = /^(\d{1,2}):(\d{2})$/.exec(t || ''); return m ? (+m[1]) * 60 + (+m[2]) : null; };
+const hhmm = m => { m = ((Math.round(m) % 1440) + 1440) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+function sleepDur(bed, wake){ const a = toMin(bed), b = toMin(wake); if (a == null || b == null) return null; let d = b - a; if (d <= 0) d += 1440; return d > 960 ? null : Math.round(d / 60 * 100) / 100; }
+const hmTxt = h => { const t = Math.round(h * 60); return t % 60 ? `${Math.floor(t / 60)} h ${t % 60} min` : `${Math.floor(t / 60)} h`; };
+const napTxt = n => n == null ? '' : n > 0 ? `siesta ${n} min` : 'sin siesta';
+function avgClock(list, night){ const v = list.map(toMin).filter(x => x != null).map(m => night && m < 720 ? m + 1440 : m); if (!v.length) return null; return {t:hhmm(avg(v)), spread:Math.round(Math.max(...v) - Math.min(...v))}; }
 const round1 = x => Math.round(x * 10) / 10;
 const bodyPend = {t:0, date:null, rec:null};
 function bodyRec(date){ return (bodyPend.rec && bodyPend.date === date) ? bodyPend.rec : (S.body.get(date) || null); }
@@ -793,7 +802,7 @@ function bwOn(date, list){ let kg = null; for (const w of list) { if (w.date <= 
 function setBody(date, patch, delay){
   if (S.mode === 'readonly') { toast('Solo lectura: no puedes editar esta bitácora.'); return; }
   if (bodyPend.rec && bodyPend.date !== date) flushBody();
-  const base = bodyRec(date) || {date, kg:null, sleep:sleepOf(date), quality:null};
+  const base = bodyRec(date) || {date, kg:null, sleep:sleepOf(date), quality:null, bed:null, wake:null, nap:null};
   bodyPend.date = date; bodyPend.rec = Object.assign({}, base, patch, {date});
   clearTimeout(bodyPend.t);
   if (delay) { setSave('dirty'); bodyPend.t = setTimeout(flushBody, delay); } else flushBody();
@@ -802,8 +811,8 @@ function flushBody(){
   clearTimeout(bodyPend.t);
   const r = bodyPend.rec; if (!r) return;
   bodyPend.rec = null; bodyPend.date = null;
-  if (r.kg == null && r.sleep == null && !r.quality) { if (S.body.has(r.date)) remove('body', r.date); else if (!queues.size && !timers.size) idleSave(); return; }
-  put('body', r.date, {date:r.date, kg:r.kg ?? null, sleep:r.sleep ?? null, quality:r.quality || null});
+  if (r.kg == null && r.sleep == null && !r.quality && !r.bed && !r.wake && r.nap == null) { if (S.body.has(r.date)) remove('body', r.date); else if (!queues.size && !timers.size) idleSave(); return; }
+  put('body', r.date, {date:r.date, kg:r.kg ?? null, sleep:r.sleep ?? null, quality:r.quality || null, bed:r.bed || null, wake:r.wake || null, nap:r.nap ?? null});
 }
 
 /* ---------------- Render general ---------------- */
@@ -958,6 +967,8 @@ function bodyCardHTML(date){
   const kg = r.kg ?? null, q = r.quality || null, sl = sleepOf(date);
   if (rec && S.bodyEdit !== date) {
     const parts = [kg != null ? `${fmt(kg)} kg` : 'sin peso', sl != null ? `${fmt(sl)} h de sueño` : 'sueño sin anotar'];
+    if (r.bed && r.wake) parts.push(`${r.bed} → ${r.wake}`);
+    if (r.nap != null) parts.push(napTxt(r.nap));
     if (q) parts.push(`durmió ${QUAL[q].toLowerCase()}`);
     return `<div class="card knee-row" id="bodyCard"><div class="row"><span class="label">Peso y sueño</span><span class="vals">${esc(parts.join(' · '))}</span></div><button class="btn" type="button" data-act="bodyedit">Editar</button></div>`;
   }
@@ -969,6 +980,13 @@ function bodyCardHTML(date){
       <div class="field"><label class="label" for="bodyKg">Peso (kg)</label><input class="num" id="bodyKg" inputmode="decimal" autocomplete="off" data-body="kg" value="${esc(inp(kg))}" placeholder="—"></div>
       <div class="field"><span class="label" id="bsl-l">Sueño (h)</span><div class="stepper mini"><button class="btn icon" type="button" data-act="bsleep" data-d="-0.5" aria-label="Media hora menos">−</button><output id="bslOut" aria-labelledby="bsl-l" aria-live="polite"><b>${sl == null ? '—' : fmt(sl)}</b></output><button class="btn icon" type="button" data-act="bsleep" data-d="0.5" aria-label="Media hora más">+</button></div></div>
     </div>
+    <div class="grid2">
+      <div class="field"><label class="label" for="bodyBed">Me acosté</label><input class="num time" id="bodyBed" type="time" data-body="bed" value="${esc(r.bed || '')}"></div>
+      <div class="field"><label class="label" for="bodyWake">Me levanté</label><input class="num time" id="bodyWake" type="time" data-body="wake" value="${esc(r.wake || '')}"></div>
+    </div>
+    <div class="field"><span class="label" id="bnap-l">Siesta (power nap)</span><div class="seg" role="radiogroup" aria-labelledby="bnap-l"><button type="button" role="radio" aria-checked="${r.nap === 0}" data-act="bnap" data-v="0">No dormí</button><button type="button" role="radio" aria-checked="${r.nap > 0}" data-act="bnap" data-v="20">Sí dormí</button></div>
+      ${r.nap > 0 ? `<div class="stepper mini"><button class="btn icon" type="button" data-act="bnapm" data-d="-5" aria-label="5 minutos menos">−</button><output aria-live="polite"><b id="bnapOut">${r.nap}</b> min</output><button class="btn icon" type="button" data-act="bnapm" data-d="5" aria-label="5 minutos más">+</button></div>` : ''}</div>
+    ${r.bed && r.wake && sleepDur(r.bed, r.wake) != null ? `<p class="muted sm">Entre acostarte y levantarte pasaron ${esc(hmTxt(sleepDur(r.bed, r.wake)))}. Ajusta las horas si tardaste en dormirte.</p>` : ''}
     <div class="field"><span class="label" id="bq-l">¿Cómo dormiste?</span><div class="seg" role="radiogroup" aria-labelledby="bq-l">${Object.keys(QUAL).map(k => `<button type="button" role="radio" aria-checked="${q === k}" data-act="bqual" data-v="${k}">${QUAL[k]}</button>`).join('')}</div></div>
     <div class="row between"><p class="muted sm">${esc(ctx)} <a class="lnk" href="#progreso" data-act="gotrend">Ver tendencia</a></p>${rec ? '<button class="btn sm" type="button" data-act="bodydone">Listo</button>' : ''}</div>
   </div>`;
@@ -1123,7 +1141,7 @@ function weightHTML(){
 }
 function sleepHTML(){
   const t = todayISO(); const end = S.date < t ? S.date : t;
-  const rows = Array.from({length:28}, (_, i) => { const d = addDays(end, i - 27); const b = bodyRec(d); return {d, h:sleepOf(d), q:(b && b.quality) || null}; }).filter(r => r.d >= START);
+  const rows = Array.from({length:28}, (_, i) => { const d = addDays(end, i - 27); const b = bodyRec(d); return {d, h:sleepOf(d), q:(b && b.quality) || null, bed:(b && b.bed) || null, wake:(b && b.wake) || null, nap:b && b.nap != null ? b.nap : null}; }).filter(r => r.d >= START);
   const got = rows.filter(r => r.h != null);
   let h = `<div class="card pad stack"><div class="stack-sm"><h2 class="h">Sueño</h2><p class="muted">Mínimo ${SLEEP_GOAL} h todas las noches, acostándote y levantándote a la misma hora. Si duermes menos de 6 h antes de un día de pierna o carrera, repite cargas en vez de subir.</p></div>`;
   if (!got.length) return h + '<div class="empty"><b>Sin noches registradas.</b><p>Anota en Hoy cuántas horas dormiste y cómo dormiste.</p></div></div>';
@@ -1132,9 +1150,11 @@ function sleepHTML(){
   const last = got[got.length - 1];
   const lastTxt = `última: ${fmt(last.h)} h${last.q ? `, durmió ${QUAL[last.q].toLowerCase()}` : ''} (${shortDay(last.d)})`;
   h += `<div class="kpi"><span class="label">Promedio de las últimas 7 noches</span><b class="big">${wk.length ? `${fmt(round1(avg(wk.map(r => r.h))))} h` : '—'}</b><p class="muted sm">${esc(wk.length ? `${ok} de ${wk.length} ${wk.length === 1 ? 'noche' : 'noches'} con ${SLEEP_LOW} h o más · ${lastTxt}` : `Sin registros esta última semana · ${lastTxt}`)}</p></div>`;
-  h += `<div class="legend"><span><i class="sw"></i>${SLEEP_LOW} h o más</span><span><i class="sw short"></i>Menos de ${SLEEP_LOW} h</span><span><i class="sw plan"></i>Mínimo ${SLEEP_GOAL} h</span></div>`;
+  { const w7 = rows.slice(-7), bd = avgClock(w7.map(r => r.bed).filter(Boolean), true), wk2 = avgClock(w7.map(r => r.wake).filter(Boolean), false), naps = w7.filter(r => r.nap > 0), napAvg = naps.length ? Math.round(avg(naps.map(r => r.nap))) : null;
+    if (bd || wk2 || w7.some(r => r.nap != null)) h += `<p class="muted sm">${esc([bd ? `Te acuestas hacia las ${bd.t}${bd.spread ? ` (varía ${bd.spread} min)` : ''}` : null, wk2 ? `te levantas hacia las ${wk2.t}${wk2.spread ? ` (varía ${wk2.spread} min)` : ''}` : null, w7.some(r => r.nap != null) ? `siesta ${naps.length} de ${w7.filter(r => r.nap != null).length} ${w7.filter(r => r.nap != null).length === 1 ? 'día' : 'días'}${napAvg ? `, ~${napAvg} min` : ''}` : null].filter(Boolean).join(' · '))}.</p>`; }
+  h += `<div class="legend"><span><i class="sw"></i>${SLEEP_LOW} h o más</span><span><i class="sw short"></i>Menos de ${SLEEP_LOW} h</span><span><i class="sw nap"></i>Siesta</span><span><i class="sw plan"></i>Mínimo ${SLEEP_GOAL} h</span></div>`;
   h += sleepChart(rows);
-  h += dataTable(['Fecha','Horas','Calidad'], got.slice().reverse().map(r => [shortDay(r.d) + ' ' + MON[parse(r.d).getMonth()], `${fmt(r.h)} h`, r.q ? QUAL[r.q] : '—']));
+  h += dataTable(['Fecha','Cama','Horas','Siesta','Calidad'], got.slice().reverse().map(r => [shortDay(r.d) + ' ' + MON[parse(r.d).getMonth()], r.bed && r.wake ? `${r.bed}–${r.wake}` : '—', `${fmt(r.h)} h`, r.nap == null ? '—' : r.nap > 0 ? `${r.nap} min` : 'No', r.q ? QUAL[r.q] : '—']));
   return h + '</div>';
 }
 function testVal(t, v){ if (v == null) return '—'; if (t.time) return mmss(v); return `${fmt(t.unit === '%' ? Math.round(v) : v)}${t.unit ? ' ' + t.unit : ''}`; }
@@ -1186,7 +1206,10 @@ function weekSummary(date){
   const qs = days.map(d => { const b = bodyRec(d); return b && b.quality; }).filter(Boolean);
   const qTxt = qs.length ? ' · calidad: ' + Object.keys(QUAL).reverse().filter(k => qs.includes(k)).map(k => `${qs.filter(x => x === k).length} ${QUAL[k].toLowerCase()}`).join(', ') : '';
   const shortN = sl.filter(v => v < SLEEP_LOW).length;
-  L.push(`Sueño: ${sl.length ? `${fmt(round1(avg(sl)))} h de promedio (${sl.length} ${sl.length === 1 ? 'noche' : 'noches'})${shortN ? ` · ${shortN} con menos de ${SLEEP_LOW} h` : ''}${qTxt}` : 'sin registro'}`);
+  const bedAvg = avgClock(days.map(d => { const b = bodyRec(d); return b && b.bed; }).filter(Boolean), true), wakeAvg = avgClock(days.map(d => { const b = bodyRec(d); return b && b.wake; }).filter(Boolean), false);
+  const napDays = days.map(d => { const b = bodyRec(d); return b && b.nap != null ? b.nap : null; }).filter(v => v != null);
+  const clockTxt = (bedAvg || wakeAvg || napDays.length) ? ' · ' + [bedAvg ? `acostado ~${bedAvg.t}` : null, wakeAvg ? `levantado ~${wakeAvg.t}` : null, napDays.length ? `siesta ${napDays.filter(v => v > 0).length} de ${napDays.length} ${napDays.length === 1 ? 'día' : 'días'}` : null].filter(Boolean).join(', ') : '';
+  L.push(`Sueño: ${sl.length ? `${fmt(round1(avg(sl)))} h de promedio (${sl.length} ${sl.length === 1 ? 'noche' : 'noches'})${shortN ? ` · ${shortN} con menos de ${SLEEP_LOW} h` : ''}${qTxt}${clockTxt}` : 'sin registro'}`);
   const ws = weighIns(); const wkW = ws.filter(w => w.date >= mon && w.date <= sun).map(w => w.kg); const prevW = ws.filter(w => w.date >= addDays(mon, -7) && w.date < mon).map(w => w.kg);
   L.push(`Peso: ${wkW.length ? `${fmt(round1(avg(wkW)))} kg de promedio (${wkW.length} ${wkW.length === 1 ? 'pesaje' : 'pesajes'})${prevW.length ? ` · semana anterior ${fmt(round1(avg(prevW)))} kg` : ''}` : 'sin registro'}`);
   const ss = allSessions().filter(s => s.date >= mon && s.date <= sun && sessionHasData(s)).sort((a, b) => a.date.localeCompare(b.date));
@@ -1214,7 +1237,7 @@ function viewHistorial(){
   let items = [];
   allSessionEntries().forEach(([id, s]) => { if (sessionHasData(s)) { const ks = Object.keys(s.items || {}); const nEx = ks.filter(k => hasDone(s.items[k], EX[k])).length; const nSets = sum(ks.map(k => (s.items[k].sets || []).filter(x => x.done).length)); items.push({date:s.date, col:'sessions', id, title:(SESS[s.key] && SESS[s.key].name) || s.name || 'Sesión', sub:[`${nEx} ${nEx === 1 ? 'ejercicio' : 'ejercicios'}`, nSets ? `${nSets} ${nSets === 1 ? 'serie' : 'series'}` : null, s.knee != null ? `rodilla ${s.knee}/10` : null, s.done ? 'terminada' : null].filter(Boolean).join(' · '), sk:s.key}); } });
   S.checkins.forEach((c, id) => items.push({date:c.date || id, col:'checkins', id, title:'Check-in de rodilla', sub:[`dolor ${c.pain}/10`, c.sleep != null ? `sueño ${fmt(c.sleep)} h` : null, c.swollen ? 'hinchada' : null].filter(Boolean).join(' · '), light:lightOf(c)}));
-  S.body.forEach((b, id) => (b.date || id) >= START && items.push({date:b.date || id, col:'body', id, title:'Peso y sueño', sub:[b.kg != null ? `${fmt(b.kg)} kg` : null, b.sleep != null ? `sueño ${fmt(b.sleep)} h` : null, b.quality ? `durmió ${QUAL[b.quality].toLowerCase()}` : null].filter(Boolean).join(' · ')}));
+  S.body.forEach((b, id) => (b.date || id) >= START && items.push({date:b.date || id, col:'body', id, title:'Peso y sueño', sub:[b.kg != null ? `${fmt(b.kg)} kg` : null, b.sleep != null ? `sueño ${fmt(b.sleep)} h` : null, b.bed && b.wake ? `${b.bed}–${b.wake}` : null, b.nap != null ? napTxt(b.nap) : null, b.quality ? `durmió ${QUAL[b.quality].toLowerCase()}` : null].filter(Boolean).join(' · ')}));
   S.cardio.forEach((c, id) => items.push({date:c.date, col:'cardio', id, title:CT[c.type] ? CT[c.type].name : c.type, sub:cardioLine(c).split(' · ').slice(1).join(' · ')}));
   S.tests.forEach((t, id) => { const tt = TT[t.test]; items.push({date:t.date, col:'tests', id, title:`Test: ${tt ? tt.name : t.test}`, sub: tt ? testVal(tt, t.value) : ''}); });
   items = items.filter(x => x.date >= START);
@@ -1278,12 +1301,13 @@ function sleepChart(rows){
   rows.forEach((r, i) => {
     const cx = pl + band * i + band / 2;
     if (r.h != null && r.h > 0) g += `<path class="bar${r.h < SLEEP_LOW ? ' short' : ''}" d="${barTop(cx - bw / 2, Y(r.h), bw, Y(0) - Y(r.h), 3)}"/>`;
+    if (r.nap > 0) { const top = Math.min(hi, (r.h || 0) + r.nap / 60); g += `<path class="bar nap" d="${barTop(cx - bw / 2, Y(top), bw, Y(r.h || 0) - Y(top), 3)}"/>`; }
     if ((rows.length - 1 - i) % 7 === 0) g += `<text x="${cx.toFixed(1)}" y="${hgt - 6}" text-anchor="middle">${esc(shortDate(r.d))}</text>`;
   });
   g += `<line class="ref" x1="${pl}" x2="${w - pr}" y1="${Y(SLEEP_GOAL).toFixed(1)}" y2="${Y(SLEEP_GOAL).toFixed(1)}"/><text class="reflbl" x="${pl - 6}" y="${(Y(SLEEP_GOAL) + 3.5).toFixed(1)}" text-anchor="end">${SLEEP_GOAL} h</text>`;
   g += `<line class="axis" x1="${pl}" x2="${w - pr}" y1="${Y(0)}" y2="${Y(0)}"/>`;
   rows.forEach((r, i) => {
-    const tip = `${dayLabel(r.d)} · ${r.h != null ? `${fmt(r.h)} h${r.h < SLEEP_LOW ? ', menos de ' + SLEEP_LOW + ' h' : ''}${r.q ? ` · durmió ${QUAL[r.q].toLowerCase()}` : ''}` : 'sin registro'}`;
+    const tip = `${dayLabel(r.d)} · ${r.h != null ? `${fmt(r.h)} h${r.h < SLEEP_LOW ? ', menos de ' + SLEEP_LOW + ' h' : ''}${r.bed && r.wake ? ` · ${r.bed}–${r.wake}` : ''}${r.nap != null ? ` · ${napTxt(r.nap)}` : ''}${r.q ? ` · durmió ${QUAL[r.q].toLowerCase()}` : ''}` : 'sin registro'}`;
     g += `<rect class="hit" x="${(pl + band * i).toFixed(1)}" y="${pt}" width="${band.toFixed(1)}" height="${hgt - pt - pb}" tabindex="${r.h != null ? 0 : -1}" role="img" aria-label="${esc(tip)}" data-tip="${esc(tip)}"/>`;
   });
   return `<svg class="chart" viewBox="0 0 ${w} ${hgt}" role="group" aria-label="Horas de sueño de las últimas 4 semanas">${g}</svg>`;
@@ -1365,6 +1389,8 @@ function onClick(e){
     case 'bodyedit': S.bodyEdit = S.date; refreshBody('[data-act="bsleep"][data-d="0.5"]'); break;
     case 'bodydone': flushBody(); S.bodyEdit = null; refreshBody(); break;
     case 'bsleep': { S.bodyEdit = S.date; const cur = sleepOf(S.date); const v = cur == null ? 7 : Math.max(0, Math.min(14, cur + Number(b.dataset.d))); setBody(S.date, {sleep:v}, 900); const o = $('#bslOut b'); if (o) o.textContent = fmt(v); break; }
+    case 'bnap': { S.bodyEdit = S.date; const v = Number(b.dataset.v); const r = bodyRec(S.date); setBody(S.date, {nap:(r && ((v === 0 && r.nap === 0) || (v > 0 && r.nap > 0))) ? null : v}, 0); refreshBody(`[data-act="bnap"][data-v="${v}"]`); break; }
+    case 'bnapm': { S.bodyEdit = S.date; const r = bodyRec(S.date); const v = Math.max(5, Math.min(120, ((r && r.nap) || 20) + Number(b.dataset.d))); setBody(S.date, {nap:v}, 700); const o = $('#bnapOut'); if (o) o.textContent = v; break; }
     case 'bqual': { S.bodyEdit = S.date; const v = b.dataset.v; const r = bodyRec(S.date); setBody(S.date, {quality:(r && r.quality === v) ? null : v}, 0); refreshBody(`[data-act="bqual"][data-v="${v}"]`); break; }
     case 'gotrend': flushAll(); S.focusBody = true; break;
     case 'saveci': { const c = S.ci; if (!c || c.pain == null) return; const body = {date:c.date, pain:c.pain, swollen:!!c.swollen, ext:c.ext || 'no', locked:!!c.locked, sleep:c.sleep, note:c.note || ''}; body.light = lightOf(body); if (put('checkins', c.date, body)) toast(`Check-in guardado: ${LIGHT[body.light].word}`); S.ci = null; render(); break; }
@@ -1438,6 +1464,15 @@ function onInput(e){
     const raw = t.value.trim(), v = num(raw);
     if (raw === '') setBody(S.date, {kg:null}, 1200);
     else if (v != null && v >= 30 && v <= 200) setBody(S.date, {kg:round1(v)}, 1200);
+    return;
+  }
+  if (t.matches('[data-body="bed"],[data-body="wake"]')) {
+    S.bodyEdit = S.date;
+    const f = t.dataset.body, v = t.value || null, r = bodyRec(S.date) || {};
+    const patch = {[f]:v}; const d = sleepDur(f === 'bed' ? v : r.bed, f === 'wake' ? v : r.wake);
+    if (d != null) patch.sleep = d;
+    setBody(S.date, patch, 700);
+    if (d != null) { const o = $('#bslOut b'); if (o) o.textContent = fmt(d); }
     return;
   }
   if (t.matches('.set input[data-f]')) {
